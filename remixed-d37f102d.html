@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask Matriks AI — BLSF+FHCB</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--e:#1a1208;--d:#2d1f0e;--tc:#c4622d;--oc:#d4a017;--g:#f0c040;--cr:#f5ead0;--ash:#e8dcc8;--mu:#7a6a54;--grn:#4a7c59;--red:#8b2020;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:'Crimson Pro',Georgia,serif;background:var(--e);color:var(--cr);}
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+#chat.active{display:grid;grid-template-columns:272px 1fr;height:100vh;overflow:hidden;}
+.stripe{height:5px;background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 10px,var(--oc) 10px,var(--oc) 20px,var(--e) 20px,var(--e) 30px,var(--tc) 30px,var(--tc) 40px,var(--e) 40px,var(--e) 50px,var(--oc) 50px,var(--oc) 60px);}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border:none;border-radius:10px;cursor:pointer;font-family:'Crimson Pro',serif;font-size:15px;font-weight:600;transition:all .2s;}
+.btn-p{background:linear-gradient(135deg,var(--tc),var(--oc));color:#fff;}
+.btn-g{background:transparent;border:1px solid rgba(212,160,23,.3);color:var(--ash);}
+.btn-sm{padding:7px 14px;font-size:13px;border-radius:8px;}
+.fi{width:100%;padding:11px 13px;background:rgba(45,31,14,.7);border:1px solid rgba(212,160,23,.22);border-radius:8px;color:var(--cr);font-family:'Crimson Pro',serif;font-size:15px;outline:none;}
+.fi:focus{border-color:rgba(212,160,23,.5);}
+.fi option{background:var(--d);}
+.fl{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--oc);margin-bottom:6px;}
+.fg{margin-bottom:14px;}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;}
+.b-CEO{background:rgba(240,192,64,.15);border:1px solid rgba(240,192,64,.35);color:var(--g);}
+.b-MANAGER{background:rgba(74,124,89,.15);border:1px solid rgba(74,124,89,.35);color:#7ec49a;}
+.b-VOLUNTEER{background:rgba(42,95,143,.15);border:1px solid rgba(42,95,143,.35);color:#7ab0e0;}
+.b-ARTISAN{background:rgba(196,98,45,.15);border:1px solid rgba(196,98,45,.35);color:var(--tc);}
+.b-Active,.b-approved{background:rgba(74,124,89,.15);border:1px solid rgba(74,124,89,.35);color:#7ec49a;}
+.b-pending{background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.3);color:var(--oc);}
+.b-Suspended,.b-denied{background:rgba(139,32,32,.15);border:1px solid rgba(139,32,32,.35);color:#e07070;}
+.toast{position:fixed;bottom:22px;right:22px;z-index:999;background:var(--d);border-radius:10px;padding:12px 18px;font-family:'Space Mono',monospace;font-size:11px;box-shadow:0 8px 28px rgba(0,0,0,.5);transform:translateY(20px);opacity:0;transition:all .28s;pointer-events:none;max-width:300px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.s{border:1px solid rgba(74,124,89,.4);color:#7ec49a;}
+.toast.e{border:1px solid rgba(139,32,32,.4);color:#e07070;}
+/* POP-UP MESSAGE MODAL */
+.modal{position:fixed;inset:0;background:rgba(8,4,1,.88);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal.open{display:flex;}
+.modal-box{background:var(--d);border:1px solid rgba(212,160,23,.25);border-radius:14px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.65);}
+.modal-box h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--g);margin-bottom:14px;}
+.modal-close{position:absolute;top:14px;right:16px;background:transparent;border:none;color:var(--mu);font-size:18px;cursor:pointer;}
+/* Pop message stickers */
+.sticker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;}
+.sticker{font-size:22px;padding:8px;border-radius:8px;border:2px solid transparent;cursor:pointer;text-align:center;transition:all .18s;background:rgba(45,31,14,.5);}
+.sticker.sel{border-color:var(--tc);background:rgba(196,98,45,.15);}
+.link-badge{display:inline-block;padding:3px 9px;border-radius:12px;font-family:'Space Mono',monospace;font-size:8px;text-transform:uppercase;border:1px solid rgba(212,160,23,.22);color:var(--oc);background:rgba(212,160,23,.06);margin:2px;}
+.link-badge.sel{background:rgba(196,98,45,.15);border-color:var(--tc);color:var(--g);}
+/* SIDEBAR */
+.csb{background:var(--d);border-right:1px solid rgba(212,160,23,.16);display:flex;flex-direction:column;overflow:hidden;position:relative;}
+.csb::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--tc),var(--oc),var(--g));}
+.csb-top{padding:18px 16px 12px;border-bottom:1px solid rgba(212,160,23,.1);}
+.csb-logo{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.csb-ico{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--tc),var(--oc));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.csb-nt{font-family:'Playfair Display',serif;font-size:13px;font-weight:900;color:var(--g);}
+.csb-ns{font-family:'Space Mono',monospace;font-size:7px;color:var(--mu);letter-spacing:.12em;text-transform:uppercase;}
+.csb-user{background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.14);border-radius:7px;padding:7px 10px;display:flex;align-items:center;gap:7px;}
+.udot{width:6px;height:6px;background:var(--grn);border-radius:50%;flex-shrink:0;}
+.uname{font-family:'Space Mono',monospace;font-size:8px;color:var(--oc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.csb-tabs{display:flex;flex-wrap:wrap;border-bottom:1px solid rgba(212,160,23,.09);}
+.ctab{flex:1;min-width:50%;padding:7px 2px;background:transparent;border:none;color:var(--mu);font-family:'Space Mono',monospace;font-size:7px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .17s;border-bottom:2px solid transparent;}
+.ctab.on{color:var(--g);border-bottom-color:var(--tc);}
+.stab{display:none;flex:1;flex-direction:column;overflow-y:auto;}
+.stab.on{display:flex;}
+.csec{padding:10px 14px 5px;}
+.slbl{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);margin-bottom:7px;}
+.smb{display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;background:transparent;border:1px solid transparent;border-radius:6px;color:var(--ash);font-family:'Crimson Pro',serif;font-size:13px;cursor:pointer;text-align:left;margin-bottom:2px;transition:all .17s;}
+.smb.on{background:rgba(196,98,45,.13);border-color:rgba(196,98,45,.36);color:var(--g);}
+.sdot{width:5px;height:5px;border-radius:50%;background:var(--mu);flex-shrink:0;}
+.smb.on .sdot{background:var(--tc);}
+.sdiv{height:1px;background:rgba(212,160,23,.08);margin:8px 14px;}
+.sqlinks{padding:0 14px;overflow-y:auto;}
+.slnk{display:flex;align-items:center;gap:7px;width:100%;padding:6px 8px;background:transparent;border:none;border-radius:6px;color:var(--ash);font-family:'Crimson Pro',serif;font-size:12.5px;cursor:pointer;text-align:left;margin-bottom:1px;transition:all .15s;}
+.slnk:hover{background:rgba(212,160,23,.06);color:var(--cr);}
+/* Basket */
+.basket-wrap{padding:10px 14px;flex:1;overflow-y:auto;}
+.bitem{display:flex;align-items:center;gap:8px;padding:8px;background:rgba(45,31,14,.5);border:1px solid rgba(212,160,23,.1);border-radius:8px;margin-bottom:6px;}
+.bico{font-size:16px;flex-shrink:0;}
+.binfo{flex:1;min-width:0;}
+.bname{font-size:12px;color:var(--cr);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bprice{font-family:'Space Mono',monospace;font-size:10px;color:var(--g);}
+.brm{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:13px;}
+.btotal{background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.14);border-radius:7px;padding:9px 12px;text-align:center;margin-bottom:8px;}
+.btlbl{font-family:'Space Mono',monospace;font-size:8px;color:var(--mu);text-transform:uppercase;margin-bottom:3px;}
+.btamt{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--g);}
+/* History */
+.hist-wrap{padding:10px 14px;flex:1;overflow-y:auto;}
+.hitem{padding:8px;background:rgba(45,31,14,.5);border:1px solid rgba(212,160,23,.09);border-radius:7px;margin-bottom:6px;cursor:pointer;}
+.hitem:hover{border-color:rgba(212,160,23,.22);}
+.hq{font-size:12px;color:var(--ash);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ht2{font-family:'Space Mono',monospace;font-size:8px;color:var(--mu);margin-top:3px;}
+/* KB */
+.kb-wrap{padding:10px 14px;flex:1;overflow-y:auto;}
+.kbf{border:2px dashed rgba(212,160,23,.2);border-radius:9px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px;}
+.kbf:hover{border-color:rgba(212,160,23,.4);background:rgba(212,160,23,.04);}
+.kbf-ico{font-size:22px;margin-bottom:6px;}
+.kbf-t{font-family:'Space Mono',monospace;font-size:8.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.1em;}
+.kbfile{display:flex;align-items:center;gap:8px;padding:7px;background:rgba(45,31,14,.6);border:1px solid rgba(212,160,23,.1);border-radius:7px;margin-bottom:5px;}
+.kbfile-name{font-size:11px;color:var(--ash);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kbfile-rm{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:12px;}
+/* Connections tab */
+.conn-wrap{padding:10px 14px;flex:1;overflow-y:auto;}
+.conn-card{display:flex;align-items:center;gap:9px;padding:8px 10px;background:rgba(45,31,14,.5);border:1px solid rgba(212,160,23,.1);border-radius:8px;margin-bottom:6px;}
+.conn-av{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,rgba(196,98,45,.4),rgba(212,160,23,.3));display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.conn-info{flex:1;min-width:0;}
+.conn-name{font-size:12px;color:var(--cr);font-weight:600;}
+.conn-rel{font-family:'Space Mono',monospace;font-size:8px;color:var(--mu);text-transform:uppercase;}
+.conn-pop{background:transparent;border:1px solid rgba(196,98,45,.3);border-radius:6px;padding:3px 7px;color:var(--tc);font-family:'Space Mono',monospace;font-size:8px;cursor:pointer;}
+.conn-pop:hover{background:rgba(196,98,45,.1);}
+/* Footer */
+.sfoot{padding:10px 14px;border-top:1px solid rgba(212,160,23,.08);}
+.sfrow{display:flex;gap:5px;}
+.sfb{flex:1;padding:6px;background:transparent;border:1px solid rgba(212,160,23,.13);border-radius:6px;color:var(--mu);font-family:'Space Mono',monospace;font-size:7px;text-transform:uppercase;cursor:pointer;transition:all .17s;}
+.sfb:hover{border-color:rgba(212,160,23,.28);color:var(--ash);}
+/* MAIN CHAT */
+.cmain{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.chdr{padding:11px 22px;border-bottom:1px solid rgba(212,160,23,.12);background:rgba(26,18,8,.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ctit{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--cr);}
+.ctit em{color:var(--g);font-style:italic;}
+.cpills{display:flex;gap:5px;align-items:center;}
+.cpill{font-family:'Space Mono',monospace;font-size:7.5px;padding:3px 8px;border-radius:13px;text-transform:uppercase;}
+.pw{background:rgba(74,124,89,.13);border:1px solid rgba(74,124,89,.3);color:#7ec49a;}
+.pl{background:rgba(196,98,45,.13);border:1px solid rgba(196,98,45,.3);color:var(--tc);display:flex;align-items:center;gap:4px;}
+.blink{width:5px;height:5px;background:var(--tc);border-radius:50%;animation:bl 1.5s infinite;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+.voice-ctrl{display:flex;gap:5px;align-items:center;}
+.vc-btn{width:30px;height:30px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;}
+.vc-mic{background:rgba(196,98,45,.13);border:1px solid rgba(196,98,45,.3);color:var(--tc);}
+.vc-mic.active{background:rgba(196,98,45,.35);animation:pulse 1.2s infinite;}
+.vc-spk{background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.22);color:var(--oc);}
+.vc-spk.muted{opacity:.45;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+/* Lang selector */
+.lang-sel{background:rgba(45,31,14,.7);border:1px solid rgba(212,160,23,.2);border-radius:7px;color:var(--oc);font-family:'Space Mono',monospace;font-size:8px;padding:4px 7px;cursor:pointer;outline:none;}
+.msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+.msgs::-webkit-scrollbar{width:3px;}
+.msgs::-webkit-scrollbar-thumb{background:rgba(212,160,23,.17);border-radius:2px;}
+/* Welcome */
+.wb{background:linear-gradient(135deg,rgba(45,31,14,.76),rgba(196,98,45,.08));border:1px solid rgba(212,160,23,.16);border-radius:14px;padding:22px;position:relative;overflow:hidden;}
+.wb::before{content:'';position:absolute;top:-1px;left:18%;right:18%;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent);}
+.wb-ey{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--tc);margin-bottom:7px;}
+.wb-t{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--g);margin-bottom:4px;}
+.wb-s{font-size:13px;color:var(--mu);font-style:italic;margin-bottom:16px;}
+.qgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.qbtn{background:rgba(212,160,23,.05);border:1px solid rgba(212,160,23,.14);border-radius:8px;padding:9px;color:var(--ash);font-family:'Crimson Pro',serif;font-size:11.5px;cursor:pointer;text-align:left;line-height:1.35;transition:all .2s;}
+.qbtn:hover{background:rgba(196,98,45,.09);border-color:rgba(196,98,45,.3);color:var(--cr);}
+.qico{font-size:13px;display:block;margin-bottom:2px;}
+/* Msg bubbles */
+.mrow{display:flex;gap:10px;align-items:flex-start;}
+.mrow.u{flex-direction:row-reverse;}
+.mav{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.mav.a{background:linear-gradient(135deg,var(--tc),var(--oc));color:#fff;}
+.mav.u{background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.22);color:var(--oc);}
+.mbub{flex:1;max-width:640px;}
+.mbub-inner{border-radius:12px;padding:11px 15px;line-height:1.65;font-size:13.5px;color:var(--cr);}
+.mbub-inner.a{background:rgba(45,31,14,.72);border:1px solid rgba(212,160,23,.11);border-top-left-radius:3px;}
+.mbub-inner.u{background:rgba(196,98,45,.15);border:1px solid rgba(196,98,45,.26);border-top-right-radius:3px;}
+.mbub-inner.err{background:rgba(139,32,32,.12);border:1px solid rgba(139,32,32,.28);color:#e07070;font-family:'Space Mono',monospace;font-size:10.5px;}
+/* Pop-up message bubble in chat */
+.pop-bubble{background:linear-gradient(135deg,rgba(74,124,89,.18),rgba(45,31,14,.7));border:1px solid rgba(74,124,89,.3);border-radius:12px;padding:12px 14px;margin:4px 0;font-size:13px;}
+.pop-bubble .pop-hd{font-family:'Space Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#7ec49a;margin-bottom:5px;}
+.pop-bubble .pop-sticker{font-size:28px;display:block;margin-bottom:5px;}
+.pop-bubble .pop-msg{color:var(--cr);line-height:1.55;}
+.pop-bubble .pop-rating{display:flex;gap:3px;margin-top:5px;}
+.star{font-size:16px;cursor:pointer;}
+.mtime{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);margin-top:4px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.mtime.u{justify-content:flex-end;}
+.mmode{padding:1px 5px;background:rgba(196,98,45,.09);border:1px solid rgba(196,98,45,.2);border-radius:6px;color:var(--tc);}
+.play-btn{background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);border-radius:5px;padding:2px 7px;color:var(--oc);cursor:pointer;font-size:10px;font-family:'Space Mono',monospace;}
+/* Product chips */
+.prod-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px;}
+.prod-chip{background:rgba(45,31,14,.8);border:1px solid rgba(212,160,23,.18);border-radius:8px;padding:8px 10px;min-width:120px;cursor:pointer;transition:all .2s;}
+.prod-chip:hover{border-color:rgba(212,160,23,.4);}
+.pc-name{font-size:11.5px;color:var(--cr);font-weight:600;margin-bottom:2px;}
+.pc-price{font-family:'Space Mono',monospace;font-size:11px;color:var(--g);}
+.pc-add{font-size:9px;color:var(--tc);font-family:'Space Mono',monospace;}
+/* Typing */
+.typing{display:flex;gap:10px;align-items:center;}
+.dots{display:flex;gap:5px;padding:10px 14px;background:rgba(45,31,14,.72);border:1px solid rgba(212,160,23,.11);border-radius:12px 12px 12px 3px;}
+.dot{width:5px;height:5px;background:var(--oc);border-radius:50%;}
+.dot:nth-child(1){animation:bc 1.2s .0s infinite;}
+.dot:nth-child(2){animation:bc 1.2s .2s infinite;}
+.dot:nth-child(3){animation:bc 1.2s .4s infinite;}
+@keyframes bc{0%,80%,100%{transform:translateY(0);opacity:.3}40%{transform:translateY(-6px);opacity:1}}
+/* Input */
+.cinput{padding:11px 20px 14px;border-top:1px solid rgba(212,160,23,.12);background:rgba(26,18,8,.92);flex-shrink:0;}
+.cinwrap{display:flex;gap:8px;align-items:flex-end;background:rgba(45,31,14,.58);border:1px solid rgba(212,160,23,.18);border-radius:12px;padding:8px 11px;}
+.cinwrap textarea{flex:1;background:transparent;border:none;outline:none;color:var(--cr);font-family:'Crimson Pro',serif;font-size:14.5px;line-height:1.5;resize:none;max-height:100px;overflow-y:auto;}
+.cinwrap textarea::placeholder{color:var(--mu);font-style:italic;}
+.cin-btns{display:flex;gap:5px;align-items:center;flex-shrink:0;}
+.ic-btn{width:33px;height:33px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;flex-shrink:0;}
+.ic-att{background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.18);color:var(--oc);}
+.ic-mic{background:rgba(196,98,45,.1);border:1px solid rgba(196,98,45,.25);color:var(--tc);}
+.ic-mic.rec{background:rgba(196,98,45,.35);animation:pulse 1s infinite;}
+.ic-send{background:linear-gradient(135deg,var(--tc),var(--oc));color:#fff;}
+.ic-send:disabled{opacity:.4;cursor:not-allowed;}
+.chint{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);margin-top:5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.msg-counter{color:var(--tc);font-family:'Space Mono',monospace;font-size:8px;padding:2px 7px;background:rgba(196,98,45,.09);border-radius:8px;}
+/* HOME */
+#home{overflow-y:auto;}
+.hnav{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:13px 40px;background:rgba(26,18,8,.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,160,23,.1);}
+.nlogo{display:flex;align-items:center;gap:10px;}
+.nico{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--tc),var(--oc));display:flex;align-items:center;justify-content:center;font-size:15px;}
+.ntit{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--g);}
+.nsub{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);letter-spacing:.14em;text-transform:uppercase;}
+.hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(48px,8vw,84px);font-weight:900;line-height:.97;color:var(--cr);margin-bottom:11px;}
+.hero h1 em{color:var(--g);font-style:italic;}
+.ht{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--tc);margin-bottom:16px;padding:4px 12px;border:1px solid rgba(196,98,45,.22);border-radius:18px;background:rgba(196,98,45,.06);display:inline-block;}
+.hs{font-size:17px;color:var(--ash);font-style:italic;max-width:500px;line-height:1.65;margin:0 auto 10px;}
+.hth{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--mu);margin-bottom:30px;}
+.hacts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:44px;}
+.hstats{display:flex;border:1px solid rgba(212,160,23,.14);border-radius:12px;overflow:hidden;background:rgba(45,31,14,.5);}
+.hsi{padding:15px 24px;text-align:center;border-right:1px solid rgba(212,160,23,.1);}
+.hsi:last-child{border-right:none;}
+.hsin{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--g);}
+.hsil{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
+.psec{padding:50px 40px 60px;max-width:1060px;margin:0 auto;}
+.psec h2{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--cr);text-align:center;margin-bottom:6px;}
+.psec p{font-size:14px;color:var(--mu);text-align:center;font-style:italic;margin-bottom:28px;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:11px;}
+.pcard{background:rgba(45,31,14,.5);border:1px solid rgba(212,160,23,.1);border-radius:10px;padding:14px;}
+.pcard.lux{background:rgba(212,160,23,.05);border-color:rgba(212,160,23,.22);}
+.pn{font-family:'Playfair Display',serif;font-size:13.5px;font-weight:700;color:var(--cr);margin-bottom:2px;}
+.pcard.lux .pn{color:var(--g);}
+.pc2{font-size:11.5px;color:var(--mu);margin-bottom:7px;font-style:italic;}
+.pp{font-family:'Space Mono',monospace;font-size:13px;color:var(--g);font-weight:700;}
+.hfooter{border-top:1px solid rgba(212,160,23,.1);padding:20px 40px;display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:8.5px;color:var(--mu);flex-wrap:wrap;gap:6px;}
+/* AUTH */
+#auth{overflow-y:auto;}
+.awrap{min-height:100vh;display:flex;}
+.aleft{flex:1;display:flex;flex-direction:column;justify-content:center;padding:50px;background:rgba(45,31,14,.32);border-right:1px solid rgba(212,160,23,.1);}
+.aleft h2{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--g);line-height:1.1;margin-bottom:11px;}
+.aleft h2 em{display:block;font-style:italic;font-size:26px;color:var(--cr);}
+.aleft p{font-size:14px;color:var(--mu);line-height:1.7;max-width:320px;margin-bottom:22px;}
+.pledge{background:rgba(196,98,45,.08);border-left:3px solid var(--tc);border-radius:0 7px 7px 0;padding:13px 16px;font-style:italic;font-size:12.5px;color:var(--ash);line-height:1.65;max-width:350px;}
+.pledge cite{display:block;font-size:9.5px;font-style:normal;color:var(--mu);margin-top:6px;font-family:'Space Mono',monospace;}
+.aright{width:440px;flex-shrink:0;display:flex;flex-direction:column;padding:36px 44px;overflow-y:auto;}
+.back-lnk{display:inline-flex;align-items:center;gap:5px;background:transparent;border:none;color:var(--mu);font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-bottom:22px;padding:0;}
+.atabs{display:flex;border:1px solid rgba(212,160,23,.18);border-radius:9px;overflow:hidden;margin-bottom:22px;}
+.atab{flex:1;padding:10px;background:transparent;border:none;color:var(--mu);font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .18s;}
+.atab.on{background:rgba(196,98,45,.14);color:var(--g);}
+.aform{display:none;}
+.aform.on{display:block;}
+.aform h3{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--cr);margin-bottom:3px;}
+.aform .sub{font-size:12.5px;color:var(--mu);font-style:italic;margin-bottom:18px;}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:13px;}
+.ropt{background:rgba(45,31,14,.5);border:2px solid rgba(212,160,23,.12);border-radius:9px;padding:10px;cursor:pointer;transition:all .18s;text-align:center;user-select:none;}
+.ropt.sel{border-color:var(--tc);background:rgba(196,98,45,.12);}
+.ri{font-size:17px;display:block;margin-bottom:3px;}
+.rl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.09em;text-transform:uppercase;color:var(--ash);}
+.ropt.sel .rl{color:var(--g);}
+.coderow{display:none;margin-bottom:12px;}
+.hint{font-size:10.5px;color:var(--mu);margin-top:3px;font-style:italic;}
+.agree{background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.13);border-radius:7px;padding:9px 11px;margin-bottom:14px;font-size:11.5px;color:var(--mu);line-height:1.5;}
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--mu);font-size:10.5px;font-family:'Space Mono',monospace;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(212,160,23,.12);}
+.dhint{margin-top:16px;background:rgba(212,160,23,.05);border:1px solid rgba(212,160,23,.13);border-radius:7px;padding:10px 12px;font-family:'Space Mono',monospace;font-size:9.5px;color:var(--mu);line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- POP-UP MESSAGE MODAL -->
+<div class="modal" id="pop-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closePopModal()">✕</button>
+    <h3>✉ Send a Pop-Up Message</h3>
+    <div class="fg">
+      <label class="fl">Choose Connection</label>
+      <div id="pop-recipients" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;"></div>
+    </div>
+    <div class="fg">
+      <label class="fl">Choose a Sticker</label>
+      <div class="sticker-grid" id="sticker-grid"></div>
+    </div>
+    <div class="fg">
+      <label class="fl">Your Message</label>
+      <textarea class="fi" id="pop-text" rows="3" placeholder="Type your message here…" style="font-size:13px;resize:vertical;"></textarea>
+    </div>
+    <div id="pop-rating-section" style="display:none;">
+      <label class="fl">Rate this Artisan</label>
+      <div id="pop-stars" style="display:flex;gap:4px;margin-bottom:10px;font-size:22px;">
+        <span class="star" onclick="setRating(1)">☆</span><span class="star" onclick="setRating(2)">☆</span><span class="star" onclick="setRating(3)">☆</span><span class="star" onclick="setRating(4)">☆</span><span class="star" onclick="setRating(5)">☆</span>
+      </div>
+    </div>
+    <div id="pop-msg-limit" style="font-family:'Space Mono',monospace;font-size:8.5px;color:var(--mu);margin-bottom:10px;"></div>
+    <div id="pop-birthday-note" style="background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.18);border-radius:7px;padding:8px;margin-bottom:10px;font-size:12px;color:var(--oc);display:none;"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-p btn-sm" onclick="sendPopMessage()" style="flex:1;justify-content:center;">Send Pop-Up ✦</button>
+      <button class="btn btn-g btn-sm" onclick="closePopModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="page">
+  <div class="stripe"></div>
+  <nav class="hnav">
+    <div class="nlogo">
+      <div class="nico">✦</div>
+      <div><div class="ntit">Ask Matriks AI</div><div class="nsub">BLSF · FHCB · Ward 11</div></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-g btn-sm" onclick="goTo('auth','login')">Sign In</button>
+      <button class="btn btn-p btn-sm" onclick="goTo('auth','signup')">Join Now</button>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="ht">Bulelani Living Stone Foundation · Freedom Brands · Ward 11 · 2026</div>
+    <h1>Ask<br><em>Matriks</em></h1>
+    <p class="hs">"I am you in me and you are me in you."<br>Community AI for BLSF + FHCB · Ward 11, Seshego</p>
+    <div class="hth">⬥ God's Kingdom — A Crowded Room ⬥</div>
+    <div class="hacts">
+      <button class="btn btn-p" onclick="goTo('auth','signup')">✦ Join the Movement</button>
+      <button class="btn btn-g" onclick="goTo('chat')">Start Chatting</button>
+    </div>
+    <div class="hstats">
+      <div class="hsi"><div class="hsin">4,000</div><div class="hsil">Houses</div></div>
+      <div class="hsi"><div class="hsin">R800K</div><div class="hsil">Target</div></div>
+      <div class="hsi"><div class="hsin">90%</div><div class="hsil">Artisan Rev.</div></div>
+      <div class="hsi"><div class="hsin">12Wk</div><div class="hsil">Campaign</div></div>
+    </div>
+  </div>
+  <div class="psec">
+    <h2>FHCB Products</h2>
+    <p>Every purchase funds Ward 11. Every artisan earns 90%.</p>
+    <div class="pgrid" id="prod-grid"></div>
+  </div>
+  <div class="hfooter">
+    <span>© 2026 BLSF · bls.foundation@gmail.com</span>
+    <span>Ward 11, Seshego, Polokwane, Limpopo</span>
+    <span>Stanley Sivhabu — Mr South Africa 103</span>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="auth" class="page">
+  <div class="stripe"></div>
+  <div class="awrap">
+    <div class="aleft">
+      <h2>Join Ward 11<em>Community Movement</em></h2>
+      <p>Become a volunteer, artisan, or manager in the BLSF communal crime prevention and economic development campaign for Ward 11.</p>
+      <div class="pledge">"On my honour: I pledge that I am the nerve of my community and I shall perform my communal duties and protect to preserve my culture and my people without prejudice to any, so help me God."<cite>— BLSF Volunteer's Pledge</cite></div>
+    </div>
+    <div class="aright">
+      <button class="back-lnk" onclick="goTo('home')">← Return to Home</button>
+      <div class="atabs">
+        <button class="atab on" id="tab-su" onclick="switchTab('signup')">Sign Up</button>
+        <button class="atab" id="tab-li" onclick="switchTab('login')">Sign In</button>
+      </div>
+      <div class="aform on" id="form-signup">
+        <h3>Create Account</h3>
+        <div class="sub">Join the Ward 11 community network</div>
+        <div class="fg"><label class="fl">Select Your Role</label>
+          <div class="rgrid">
+            <div class="ropt sel" onclick="selRole(this,'VOLUNTEER')"><span class="ri">🤝</span><span class="rl">Volunteer</span></div>
+            <div class="ropt" onclick="selRole(this,'ARTISAN')"><span class="ri">🎨</span><span class="rl">Artisan</span></div>
+            <div class="ropt" onclick="selRole(this,'MANAGER')"><span class="ri">📋</span><span class="rl">Manager</span></div>
+            <div class="ropt" onclick="selRole(this,'CEO')"><span class="ri">👑</span><span class="rl">CEO / Admin</span></div>
+          </div>
+        </div>
+        <div class="coderow" id="ceo-row"><label class="fl">CEO Authorization Code</label><input class="fi" type="password" id="su-ceocode" placeholder="Enter CEO code…"><div class="hint">Demo: BLSF-CEO-2026</div></div>
+        <div class="coderow" id="mgr-row"><label class="fl">Manager Code</label><input class="fi" type="password" id="su-mgrcode" placeholder="Enter manager code…"><div class="hint">Demo: WARD11-MGR</div></div>
+        <div class="fg"><label class="fl">Full Name</label><input class="fi" type="text" id="su-name" placeholder="Your full name"></div>
+        <div class="fg"><label class="fl">Email Address</label><input class="fi" type="email" id="su-email" placeholder="your@email.com"></div>
+        <div class="fg"><label class="fl">Date of Birth</label><input class="fi" type="date" id="su-dob"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="su-pass" placeholder="Minimum 8 characters"></div>
+        <div class="fg"><label class="fl">Ward / Area</label>
+          <select class="fi" id="su-ward"><option value="">Select your ward…</option><option value="ward11">Ward 11 — Seshego (Primary)</option><option value="other">Other Ward</option></select></div>
+        <div class="fg"><label class="fl">Preferred Language</label>
+          <select class="fi" id="su-lang"><option value="en">English</option><option value="zu">isiZulu</option><option value="xh">isiXhosa</option><option value="af">Afrikaans</option><option value="st">Sesotho</option><option value="tn">Setswana</option><option value="ts">Xitsonga</option><option value="ve">Tshivenda</option><option value="nso">Sepedi / Sesotho sa Leboa</option><option value="nr">isiNdebele</option><option value="ss">Siswati</option><option value="sl">Sign Language</option></select></div>
+        <div class="agree">By signing up you agree to uphold the <strong style="color:var(--oc)">BLSF Volunteer Pledge</strong> and the values of the 1949 Programme of Action.</div>
+        <button class="btn btn-p" style="width:100%;justify-content:center;" onclick="doSignUp()">✦ Create Account &amp; Join Ward 11</button>
+        <div style="text-align:center;margin-top:12px;font-size:12.5px;color:var(--mu);">Already a member? <button onclick="switchTab('login')" style="background:none;border:none;color:var(--g);cursor:pointer;font-size:12.5px;font-weight:700;">Sign In</button></div>
+      </div>
+      <div class="aform" id="form-login">
+        <h3>Welcome Back</h3>
+        <div class="sub">Sign in to your Matriks account</div>
+        <div class="fg"><label class="fl">Email Address</label><input class="fi" type="email" id="li-email" placeholder="your@email.com"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="li-pass" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn btn-p" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="doLogin()">Sign In →</button>
+        <div class="divider">or</div>
+        <button class="btn btn-g" style="width:100%;justify-content:center;font-size:13.5px;" onclick="demoLogin()">🚀 Demo — Full CEO Access (Stanley)</button>
+        <div class="dhint"><strong style="color:var(--oc)">Existing accounts:</strong><br>stanley@blsf.org → CEO · Mr SA 103<br>mbulelo@blsf.org → Manager<br>william@blsf.org → Volunteer<br><span style="color:var(--mu);font-size:8.5px;">(any password works in demo)</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div id="chat" class="page active">
+  <aside class="csb">
+    <div class="csb-top">
+      <div class="csb-logo"><div class="csb-ico">✦</div><div><div class="csb-nt">Ask Matriks AI</div><div class="csb-ns">BLSF · FHCB · Ward 11</div></div></div>
+      <div class="csb-user"><div class="udot"></div><div class="uname" id="chat-uname">Community Member</div><span class="badge b-VOLUNTEER" id="chat-role-badge" style="flex-shrink:0;font-size:7px;padding:1px 5px;">Guest</span></div>
+    </div>
+    <div class="csb-tabs">
+      <button class="ctab on" onclick="setSTab(this,'chat-tab')">💬 Chat</button>
+      <button class="ctab" onclick="setSTab(this,'basket-tab')">🛒 Basket</button>
+      <button class="ctab" onclick="setSTab(this,'hist-tab')">📜 History</button>
+      <button class="ctab" onclick="setSTab(this,'conn-tab')">👥 Connections</button>
+      <button class="ctab" onclick="setSTab(this,'kb-tab')">📚 Knowledge</button>
+    </div>
+    <!-- CHAT TAB -->
+    <div class="stab on" id="chat-tab">
+      <div class="csec">
+        <div class="slbl">Response Mode</div>
+        <button class="smb on" onclick="setMode(this,'TEACHING')"><span class="sdot"></span>📖 Teaching</button>
+        <button class="smb" onclick="setMode(this,'MOTIVATING')"><span class="sdot"></span>🔥 Motivating</button>
+        <button class="smb" onclick="setMode(this,'COMMERCIAL')"><span class="sdot"></span>🛒 Commercial</button>
+        <button class="smb" onclick="setMode(this,'HISTORICAL')"><span class="sdot"></span>📜 Historical</button>
+        <button class="smb" onclick="setMode(this,'COMFORTING')"><span class="sdot"></span>🤗 Comforting</button>
+        <button class="smb" onclick="setMode(this,'NUMBERS')"><span class="sdot"></span>🔢 Numbers</button>
+        <button class="smb" onclick="setMode(this,'TRANSLATION')"><span class="sdot"></span>🌍 Translate</button>
+      </div>
+      <div class="sdiv"></div>
+      <div class="sqlinks">
+        <div class="slbl">Quick Actions</div>
+        <button class="slnk" onclick="openPopModal()">✉ Send Pop-Up Message</button>
+        <button class="slnk" onclick="quickAsk('Show all FHCB products with prices and artisan names')">🎨 FHCB Products</button>
+        <button class="slnk" onclick="quickAsk('Find hardware stores and building suppliers near Seshego Ward 11 Polokwane')">🔨 Hardware Stores</button>
+        <button class="slnk" onclick="quickAsk('Find farmers and food suppliers near Polokwane for the community')">🌾 Farmers & Suppliers</button>
+        <button class="slnk" onclick="quickAsk('List logistics and delivery companies in Polokwane for artisans')">🚚 Logistics</button>
+        <button class="slnk" onclick="quickAsk('Explain the 1949 Programme of Action and the SelfID framework')">📚 1949 Syllabus</button>
+        <button class="slnk" onclick="quickAsk('Show me my chat history summary')">📜 My History</button>
+        <button class="slnk" onclick="quickAsk('Help me with a maths calculation or stock quantity advice')">🔢 Numbers Help</button>
+        <button class="slnk" onclick="quickAsk('Translate this message to isiZulu: Welcome to Ask Matriks AI')">🌍 Translate</button>
+      </div>
+    </div>
+    <!-- BASKET TAB -->
+    <div class="stab" id="basket-tab">
+      <div class="basket-wrap">
+        <div class="btotal"><div class="btlbl">Basket Total</div><div class="btamt" id="basket-total">R0</div></div>
+        <div id="basket-list"><div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:14px 0;">Your basket is empty.</div></div>
+        <button class="btn btn-p btn-sm" style="width:100%;justify-content:center;margin-top:8px;" onclick="checkoutBasket()">✦ Checkout</button>
+        <button class="btn btn-g btn-sm" style="width:100%;justify-content:center;margin-top:6px;" onclick="clearBasket()">Clear Basket</button>
+      </div>
+    </div>
+    <!-- HISTORY TAB -->
+    <div class="stab" id="hist-tab">
+      <div class="hist-wrap">
+        <div class="slbl">Session History</div>
+        <div id="hist-list"><div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:14px 0;">No history yet.</div></div>
+        <div class="sdiv"></div>
+        <div class="slbl">Saved Favourites</div>
+        <div id="fav-list"><div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:8px 0;">No saved items.</div></div>
+      </div>
+    </div>
+    <!-- CONNECTIONS TAB -->
+    <div class="stab" id="conn-tab">
+      <div class="conn-wrap">
+        <div class="slbl">My Linked People</div>
+        <div id="conn-list"></div>
+        <div class="sdiv"></div>
+        <div class="slbl">Add New Connection</div>
+        <div class="fg"><input class="fi" id="conn-name" placeholder="Full name" style="margin-bottom:6px;font-size:12px;"></div>
+        <div class="fg"><input class="fi" id="conn-dob" type="date" style="margin-bottom:6px;font-size:12px;"></div>
+        <div class="fg"><select class="fi" id="conn-rel" style="margin-bottom:6px;font-size:12px;">
+          <option value="">Relationship…</option>
+          <option>Friend</option><option>Sibling</option><option>Brother</option><option>Sister</option>
+          <option>Aunt</option><option>Uncle</option><option>Parent</option><option>Child</option>
+          <option>Colleague</option><option>Neighbour</option><option>Artisan</option><option>Manager</option>
+        </select></div>
+        <div class="fg"><select class="fi" id="conn-role" style="margin-bottom:8px;font-size:12px;">
+          <option value="USER">User</option><option value="ARTISAN">Artisan</option><option value="MANAGER">Manager</option>
+        </select></div>
+        <button class="btn btn-p btn-sm" style="width:100%;justify-content:center;" onclick="addConnection()">+ Link Person</button>
+        <div style="font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);margin-top:8px;padding:6px;background:rgba(212,160,23,.04);border-radius:6px;line-height:1.6;">
+          User→User pop-ups: <strong style="color:var(--oc)" id="uu-limit-display">3 remaining</strong><br>
+          User→Artisan: <strong style="color:#7ec49a">Unlimited</strong>
+        </div>
+      </div>
+    </div>
+    <!-- KNOWLEDGE TAB -->
+    <div class="stab" id="kb-tab">
+      <div class="kb-wrap">
+        <div class="slbl">Upload to Knowledge Base</div>
+        <div class="kbf" onclick="document.getElementById('kb-file-input').click()" id="kb-dropzone">
+          <div class="kbf-ico">📎</div>
+          <div class="kbf-t">Drop or tap to upload</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:3px;font-style:italic;">PDF, bank statements, receipts, images, audio</div>
+        </div>
+        <input type="file" id="kb-file-input" style="display:none" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.mp4,.mp3,.wav,.mov,.webm,.csv,.xlsx" onchange="handleKBUpload(this)">
+        <div id="kb-files"></div>
+        <div class="sdiv"></div>
+        <div class="slbl">Text / Data Entry</div>
+        <textarea class="fi" id="kb-text" rows="3" placeholder="Paste bank statement info, receipts, stock data, prices, contacts…" style="margin-bottom:8px;resize:vertical;font-size:12px;"></textarea>
+        <button class="btn btn-p btn-sm" style="width:100%;justify-content:center;" onclick="saveKBText()">+ Save to Knowledge Base</button>
+        <div class="sdiv"></div>
+        <div class="slbl">Saved Knowledge (<span id="kb-count">0</span>)</div>
+        <div id="kb-entries"></div>
+      </div>
+    </div>
+    <div class="sfoot">
+      <div class="sfrow">
+        <button class="sfb" style="color:var(--tc);" onclick="goTo('home')">⌂ Home</button>
+        <button class="sfb" onclick="openPopModal()">✉ Pop</button>
+        <button class="sfb" onclick="clearChat()">↺ Clear</button>
+        <button class="sfb" onclick="saveSession()">💾 Save</button>
+      </div>
+    </div>
+  </aside>
+  <div class="cmain">
+    <div class="chdr">
+      <div class="ctit">Ask <em>Matriks</em> <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--mu);">BLSF+FHCB</span></div>
+      <div style="display:flex;gap:7px;align-items:center;">
+        <select class="lang-sel" id="lang-sel" onchange="setLang(this.value)">
+          <option value="en">🇿🇦 EN</option><option value="zu">🇿🇦 ZU</option><option value="xh">🇿🇦 XH</option>
+          <option value="af">🇿🇦 AF</option><option value="st">🇿🇦 ST</option><option value="tn">🇿🇦 TN</option>
+          <option value="nso">🇿🇦 NS</option><option value="ts">🇿🇦 TS</option><option value="ve">🇿🇦 VE</option>
+        </select>
+        <div class="voice-ctrl">
+          <button class="vc-btn vc-mic" id="hd-mic" onclick="toggleVoiceInput()" title="Voice Input">🎤</button>
+          <button class="vc-btn vc-spk" id="hd-spk" onclick="toggleVoiceOutput()" title="Toggle Voice Reply">🔊</button>
+        </div>
+        <div class="cpills">
+          <span class="cpill pw">Ward 11 Online</span>
+          <span class="cpill pl"><span class="blink"></span>Live AI</span>
+        </div>
+      </div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="cinput">
+      <div class="cinwrap">
+        <textarea id="chat-input" rows="1" placeholder="Hi, just Ask — it will be done for you…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <div class="cin-btns">
+          <button class="ic-btn ic-att" onclick="document.getElementById('chat-att').click()" title="Attach file">📎</button>
+          <input type="file" id="chat-att" style="display:none" accept="image/*,.pdf,.doc,.txt,.csv" onchange="handleChatAttach(this)">
+          <button class="ic-btn ic-mic" id="mic-btn" onclick="toggleVoiceInput()" title="Voice input">🎤</button>
+          <button class="ic-btn ic-send" id="send-btn" onclick="sendMsg()" disabled>➤</button>
+        </div>
+      </div>
+      <div class="chint">
+        <span>Enter · Shift+Enter new line</span>
+        <span class="msg-counter" id="msg-counter">💬 Chat Msgs: <strong id="msg-count-left">5</strong> left</span>
+        <span class="msg-counter" id="voice-status" style="color:var(--oc);">🔊 Voice ON</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Core State ─────────────────────────────────────────────────────
+const AUTH_CODES={CEO:'BLSF-CEO-2026',MANAGER:'WARD11-MGR'};
+let curUser=null,curMode='TEACHING',chatHistory=[],isLoading=false,selRoleVal='VOLUNTEER';
+let voiceOutputOn=true,isRecording=false,recognition=null;
+let basket=[],kbFiles=[],kbEntries=[],historyLog=[],savedFavs=[];
+let connections=[],userMsgCount=0,curLang='en',curRating=0;
+let selectedPopRecipient=null,selectedSticker='🙏',curAttachment=null;
+const MAX_USER_MSGS=5,MAX_UU_POPS=3;
+let popsSentUU=0;
+
+// ── Products ───────────────────────────────────────────────────────
+const products=[
+  {id:'p1',name:'My-Holder Mini Max',creator:'Xhalisile Ishmael Mayo',artisanId:'a1',price:100,cat:'craft',desc:'Innovative holder, compact design'},
+  {id:'p2',name:'My-Holder Mini',creator:'Mbulelo Gladman Mayo',artisanId:'a2',price:200,cat:'craft',desc:'Premium mini holder'},
+  {id:'p3',name:'Table Stacks',creator:'Palesa Nqula',artisanId:'a3',price:120,cat:'craft',desc:'Stylish stackable organiser'},
+  {id:'p4',name:'Photo Frame Collage',creator:'Nomonde Albertina Sivhabu',artisanId:'a4',price:350,cat:'craft',desc:'African heritage frame collage'},
+  {id:'p5',name:'Mirror Africa',creator:'Khethiwe Constance Mangwwe',artisanId:'a5',price:180,cat:'craft',desc:'Handcrafted African mirror'},
+  {id:'p6',name:'Royal Shweshwe Tapestry',creator:'Luxury Line',artisanId:'lux',price:1450,cat:'luxury',desc:'Premium Shweshwe fabric art'},
+  {id:'p7',name:'Hand-Carved Ebony Big Five',creator:'Luxury Line',artisanId:'lux',price:2800,cat:'luxury',desc:'Handcarved ebony sculpture set'},
+  {id:'p8',name:'Ndebele Heritage Neckpiece',creator:'Luxury Line',artisanId:'lux',price:850,cat:'luxury',desc:'Authentic Ndebele beadwork'},
+];
+
+const STICKERS=['🙏','❤️','🌟','🎉','👏','🔥','💛','✦','🌺','🤝','🏆','💪','🌍','🎨','😊','🕊️','🙌','🌈','👑','💎'];
+
+const defaultConnections=[
+  {id:'c1',name:'Mbulelo Gladman Mayo',rel:'Colleague',role:'ARTISAN',dob:'1985-03-14',artisanId:'a2'},
+  {id:'c2',name:'Palesa Nqula',rel:'Colleague',role:'ARTISAN',dob:'1990-07-22',artisanId:'a3'},
+  {id:'c3',name:'William Makoro',rel:'Colleague',role:'USER',dob:'1978-11-05',artisanId:null},
+];
+
+// ── LS Helpers ─────────────────────────────────────────────────────
+function lsKey(k){return curUser?'matriks_'+curUser.email+'_'+k:'matriks_guest_'+k;}
+function lsSave(k,v){try{localStorage.setItem(lsKey(k),JSON.stringify(v));}catch(e){}}
+function lsLoad(k,def){try{const v=localStorage.getItem(lsKey(k));return v?JSON.parse(v):def;}catch(e){return def;}}
+
+function loadUserData(){
+  basket=lsLoad('basket',[]);kbEntries=lsLoad('kb_entries',[]);
+  historyLog=lsLoad('history',[]);savedFavs=lsLoad('favourites',[]);
+  connections=lsLoad('connections',defaultConnections);
+  userMsgCount=lsLoad('msg_count',0);popsSentUU=lsLoad('pops_uu',0);
+  renderBasket();renderKB();renderHistory();renderConnections();
+  document.getElementById('msg-count-left').textContent=Math.max(0,MAX_USER_MSGS-userMsgCount);
+  document.getElementById('uu-limit-display').textContent=Math.max(0,MAX_UU_POPS-popsSentUU)+' remaining';
+}
+function saveAllData(){
+  lsSave('basket',basket);lsSave('kb_entries',kbEntries);
+  lsSave('history',historyLog);lsSave('favourites',savedFavs);
+  lsSave('connections',connections);lsSave('msg_count',userMsgCount);
+  lsSave('pops_uu',popsSentUU);
+}
+
+// ── Home Products ──────────────────────────────────────────────────
+document.getElementById('prod-grid').innerHTML=products.map(p=>`<div class="pcard${p.cat==='luxury'?' lux':''}"><div class="pn">${p.name}</div><div class="pc2">${p.creator}</div><div class="pp">R${p.price.toLocaleString()}</div></div>`).join('');
+document.getElementById('chat-input').addEventListener('input',()=>{document.getElementById('send-btn').disabled=!document.getElementById('chat-input').value.trim();});
+
+// ── Navigation ─────────────────────────────────────────────────────
+function goTo(page,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  if(page==='auth'&&tab)switchTab(tab);
+  if(page==='chat')initChat();
+  window.scrollTo(0,0);
+}
+function switchTab(tab){
+  ['su','li'].forEach(t=>{document.getElementById('tab-'+t).classList.toggle('on',t===(tab==='signup'?'su':'li'));document.getElementById('form-'+(t==='su'?'signup':'login')).classList.toggle('on',t===(tab==='signup'?'su':'li'));});
+}
+function setSTab(btn,id){
+  document.querySelectorAll('.ctab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');document.getElementById(id).classList.add('on');
+}
+function setSTabByName(id){
+  const tabs=document.querySelectorAll('.ctab');
+  const ids=['chat-tab','basket-tab','hist-tab','conn-tab','kb-tab'];
+  tabs.forEach((b,i)=>b.classList.toggle('on',ids[i]===id));
+  document.querySelectorAll('.stab').forEach(t=>t.classList.toggle('on',t.id===id));
+}
+
+// ── Auth ───────────────────────────────────────────────────────────
+function selRole(el,role){document.querySelectorAll('.ropt').forEach(r=>r.classList.remove('sel'));el.classList.add('sel');selRoleVal=role;document.getElementById('ceo-row').style.display=role==='CEO'?'block':'none';document.getElementById('mgr-row').style.display=role==='MANAGER'?'block':'none';}
+
+function doSignUp(){
+  const name=document.getElementById('su-name').value.trim(),email=document.getElementById('su-email').value.trim(),pass=document.getElementById('su-pass').value,ward=document.getElementById('su-ward').value,dob=document.getElementById('su-dob').value,lang=document.getElementById('su-lang').value;
+  if(!name||!email||!pass||!ward){showToast('Please fill all required fields','e');return;}
+  if(pass.length<8){showToast('Password min 8 characters','e');return;}
+  if(selRoleVal==='CEO'&&document.getElementById('su-ceocode').value!==AUTH_CODES.CEO){showToast('Invalid CEO code','e');return;}
+  if(selRoleVal==='MANAGER'&&document.getElementById('su-mgrcode').value!==AUTH_CODES.MANAGER){showToast('Invalid Manager code','e');return;}
+  curUser={name,email,role:selRoleVal,dob,lang,ref:'FHCB-2026-'+selRoleVal+'-NEW',status:'Active'};
+  curLang=lang||'en';
+  loadUserData();showToast('Welcome, '+name+'! Account created.','s');
+  setTimeout(()=>{updateChatUser();goTo('chat');},500);
+}
+function doLogin(){
+  const email=document.getElementById('li-email').value.trim(),pass=document.getElementById('li-pass').value;
+  if(!email||!pass){showToast('Please enter email and password','e');return;}
+  const found=[
+    {id:1,name:'Stanley Sivhabu',role:'CEO',email:'stanley@blsf.org',dob:'1975-06-16',lang:'en',ref:'FHCB-2026-CEO-001',status:'Active'},
+    {id:2,name:'Mbulelo Gladman Mayo',role:'MANAGER',email:'mbulelo@blsf.org',dob:'1985-03-14',lang:'en',ref:'FHCB-2026-MANAGER-001',status:'Active'},
+    {id:3,name:'William Makoro',role:'VOLUNTEER',email:'william@blsf.org',dob:'1978-11-05',lang:'en',ref:'FHCB-2026-VOLUNTEER-001',status:'Active'},
+  ].find(m=>m.email.toLowerCase()===email.toLowerCase());
+  if(found){curUser=found;loadUserData();showToast('Welcome back, '+found.name+'!','s');setTimeout(()=>{updateChatUser();goTo('chat');},500);}
+  else showToast('Account not found. Please sign up.','e');
+}
+function demoLogin(){
+  curUser={id:1,name:'Stanley Sivhabu',role:'CEO',email:'stanley@blsf.org',dob:'1975-06-16',lang:'en',ref:'FHCB-2026-CEO-001',status:'Active'};
+  loadUserData();showToast('Welcome, Mr South Africa 103 — Stanley Sivhabu!','s');
+  setTimeout(()=>{updateChatUser();goTo('chat');},400);
+}
+function updateChatUser(){
+  if(!curUser)return;
+  document.getElementById('chat-uname').textContent=curUser.name;
+  const rb=document.getElementById('chat-role-badge');rb.className='badge b-'+curUser.role;rb.textContent=curUser.role;
+}
+
+// ── Birthday check ─────────────────────────────────────────────────
+function checkBirthdays(){
+  const today=new Date();const mm=String(today.getMonth()+1).padStart(2,'0');const dd=String(today.getDate()).padStart(2,'0');
+  return connections.filter(c=>{if(!c.dob)return false;const parts=c.dob.split('-');return parts[1]===mm&&parts[2]===dd;});
+}
+function daysUntilBirthday(dob){
+  if(!dob)return null;const today=new Date();const parts=dob.split('-');
+  let next=new Date(today.getFullYear(),parseInt(parts[1])-1,parseInt(parts[2]));
+  if(next<today)next.setFullYear(today.getFullYear()+1);
+  return Math.round((next-today)/(1000*60*60*24));
+}
+
+// ── Chat init & welcome ────────────────────────────────────────────
+function initChat(){
+  updateChatUser();
+  const msgs=document.getElementById('msgs');msgs.innerHTML='';chatHistory=[];
+  const uname=curUser?curUser.name.split(' ')[0]:'Friend';
+  const prevCount=historyLog.length;
+  const bdays=checkBirthdays();
+  let extras='';
+  if(bdays.length){extras+=`<div style="background:rgba(240,192,64,.07);border:1px solid rgba(240,192,64,.2);border-radius:8px;padding:8px 11px;margin-bottom:10px;font-size:12.5px;color:var(--g);">🎂 Today's Birthday: <strong>${bdays.map(b=>b.name).join(', ')}</strong> — Send them a pop-up greeting!</div>`;}
+  // Suggest pop-up
+  const upcomingBdays=connections.filter(c=>{const d=daysUntilBirthday(c.dob);return d!==null&&d>0&&d<=7;});
+  if(upcomingBdays.length){extras+=`<div style="background:rgba(196,98,45,.07);border:1px solid rgba(196,98,45,.18);border-radius:8px;padding:8px 11px;margin-bottom:10px;font-size:12px;color:var(--ash);">🔔 Upcoming birthdays within 7 days: <strong style="color:var(--oc)">${upcomingBdays.map(b=>b.name+' ('+daysUntilBirthday(b.dob)+'d)').join(', ')}</strong></div>`;}
+  msgs.innerHTML=`<div class="wb">
+    <div class="wb-ey">Bulelani Living Stone Foundation · Freedom Brands · 2026</div>
+    <div class="wb-t">I am Matriks ✦</div>
+    <div class="wb-s">"I am you in me and you are me in you."</div>
+    <div style="font-size:14px;color:var(--cr);margin-bottom:12px;line-height:1.65;">Hi <strong style="color:var(--g)">${uname}</strong>, welcome to <strong>Ask Matriks AI</strong> for <strong style="color:var(--oc)">Bulelani Foundation</strong> and <strong style="color:var(--oc)">Freedom Brands</strong>. I can answer questions for both these organisations.</div>
+    ${extras}
+    <div class="qgrid">
+      <button class="qbtn" onclick="quickAsk('What is the BLSF and FHCB mission for Ward 11?')"><span class="qico">🏘️</span>BLSF Mission</button>
+      <button class="qbtn" onclick="quickAsk('Show me all FHCB products with artisan names and prices')"><span class="qico">🎨</span>FHCB Products</button>
+      <button class="qbtn" onclick="openPopModal()"><span class="qico">✉</span>Send Pop-Up</button>
+      <button class="qbtn" onclick="quickAsk('Help me calculate stock to buy for R500 budget')"><span class="qico">🔢</span>Numbers Help</button>
+      <button class="qbtn" onclick="quickAsk('Translate: Welcome to Ward 11. We are stronger together. to isiZulu')"><span class="qico">🌍</span>Translate</button>
+      <button class="qbtn" onclick="quickAsk('Show my chat history and saved favourites')"><span class="qico">📜</span>My History</button>
+    </div>
+  </div>`;
+  if(curUser&&voiceOutputOn){
+    setTimeout(()=>speak(`Hi ${uname}! Welcome to Ask Matriks AI for Bulelani Foundation and Freedom Brands. Just ask — it will be done for you.`),700);
+  }
+}
+
+// ── Connections ────────────────────────────────────────────────────
+function addConnection(){
+  const name=document.getElementById('conn-name').value.trim(),dob=document.getElementById('conn-dob').value,rel=document.getElementById('conn-rel').value,role=document.getElementById('conn-role').value;
+  if(!name||!rel){showToast('Please enter name and relationship','e');return;}
+  const id='c'+Date.now();connections.push({id,name,rel,role,dob,artisanId:role==='ARTISAN'?'a'+Date.now():null});
+  document.getElementById('conn-name').value='';document.getElementById('conn-dob').value='';
+  saveAllData();renderConnections();showToast(name+' linked as '+rel,'s');
+}
+function renderConnections(){
+  const el=document.getElementById('conn-list');
+  if(!connections.length){el.innerHTML='<div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:10px 0;">No connections yet.</div>';return;}
+  const roleIco={ARTISAN:'🎨',MANAGER:'📋',USER:'🤝',CEO:'👑'};
+  el.innerHTML=connections.map(c=>{
+    const d=daysUntilBirthday(c.dob);
+    const bdayTip=d!==null&&d<=7?`<span style="font-size:8px;color:var(--g);"> 🎂${d===0?'Today!':d+'d'}</span>`:'';
+    return `<div class="conn-card"><div class="conn-av">${roleIco[c.role]||'👤'}</div><div class="conn-info"><div class="conn-name">${c.name}${bdayTip}</div><div class="conn-rel">${c.rel} · ${c.role}</div></div><button class="conn-pop" onclick="openPopModal('${c.id}')">✉ Pop</button></div>`;
+  }).join('');
+  document.getElementById('uu-limit-display').textContent=Math.max(0,MAX_UU_POPS-popsSentUU)+' remaining';
+}
+
+// ── Pop-Up Messaging ───────────────────────────────────────────────
+function openPopModal(connId){
+  // Build recipient options
+  const recEl=document.getElementById('pop-recipients');
+  recEl.innerHTML=connections.map(c=>`<span class="link-badge${connId===c.id?' sel':''}" onclick="selectPopRecipient(this,'${c.id}')">${c.name.split(' ')[0]} (${c.rel})</span>`).join('');
+  if(connId)selectedPopRecipient=connId;
+  // Build sticker grid
+  document.getElementById('sticker-grid').innerHTML=STICKERS.map(s=>`<div class="sticker${s===selectedSticker?' sel':''}" onclick="selectSticker(this,'${s}')">${s}</div>`).join('');
+  // Rating section — only show for artisans
+  updatePopRatingSection();
+  // Birthday reminder
+  const bdays=checkBirthdays();
+  const bdEl=document.getElementById('pop-birthday-note');
+  if(bdays.length){bdEl.style.display='block';bdEl.textContent='🎂 Birthday today: '+bdays.map(b=>b.name).join(', ')+'! Why not send them a special message?';}
+  else bdEl.style.display='none';
+  // Limit display
+  updatePopLimitDisplay();
+  document.getElementById('pop-modal').classList.add('open');
+}
+function closePopModal(){document.getElementById('pop-modal').classList.remove('open');selectedPopRecipient=null;}
+function selectPopRecipient(el,id){
+  document.querySelectorAll('#pop-recipients .link-badge').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');selectedPopRecipient=id;
+  updatePopRatingSection();updatePopLimitDisplay();
+}
+function updatePopRatingSection(){
+  const rs=document.getElementById('pop-rating-section');
+  if(!selectedPopRecipient){rs.style.display='none';return;}
+  const conn=connections.find(c=>c.id===selectedPopRecipient);
+  rs.style.display=(conn&&conn.role==='ARTISAN')?'block':'none';
+}
+function updatePopLimitDisplay(){
+  const el=document.getElementById('pop-msg-limit');
+  if(!selectedPopRecipient){el.textContent='';return;}
+  const conn=connections.find(c=>c.id===selectedPopRecipient);
+  if(conn&&conn.role!=='ARTISAN'){
+    const left=Math.max(0,MAX_UU_POPS-popsSentUU);
+    el.textContent=`User-to-User limit: ${left} pop-up(s) remaining this session.`;
+    el.style.color=left===0?'#e07070':'var(--mu)';
+  } else {
+    el.textContent='Artisan messages: unlimited ✓';el.style.color='#7ec49a';
+  }
+}
+function selectSticker(el,s){document.querySelectorAll('.sticker').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');selectedSticker=s;}
+function setRating(n){curRating=n;document.querySelectorAll('#pop-stars .star').forEach((s,i)=>{s.textContent=i<n?'⭐':'☆';});}
+function sendPopMessage(){
+  if(!selectedPopRecipient){showToast('Please select a recipient','e');return;}
+  const text=document.getElementById('pop-text').value.trim();
+  if(!text){showToast('Please write a message','e');return;}
+  const conn=connections.find(c=>c.id===selectedPopRecipient);
+  if(!conn){showToast('Recipient not found','e');return;}
+  const isArtisan=conn.role==='ARTISAN';
+  if(!isArtisan&&popsSentUU>=MAX_UU_POPS){showToast('User-to-user pop-up limit reached ('+MAX_UU_POPS+')','e');return;}
+  if(!isArtisan){popsSentUU++;saveAllData();document.getElementById('uu-limit-display').textContent=Math.max(0,MAX_UU_POPS-popsSentUU)+' remaining';}
+  // Add pop-up bubble to chat
+  const msgs=document.getElementById('msgs');
+  const wb=document.querySelector('.wb');if(wb)wb.remove();
+  const ratingHtml=isArtisan&&curRating>0?`<div class="pop-rating">${Array(5).fill(0).map((_,i)=>`<span>${i<curRating?'⭐':'☆'}</span>`).join('')} <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--mu);margin-left:4px;">${curRating}/5</span></div>`:'';
+  msgs.innerHTML+=`<div class="mrow u"><div class="mav u">${curUser?curUser.name[0].toUpperCase():'G'}</div><div class="mbub"><div class="pop-bubble"><div class="pop-hd">✉ Pop-Up → ${conn.name} (${conn.rel})</div><span class="pop-sticker">${selectedSticker}</span><div class="pop-msg">${text}</div>${ratingHtml}</div><div class="mtime u"><span>${getTime()}</span><span class="mmode">POP-UP</span></div></div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+  // Auto-response for artisan rating
+  if(isArtisan&&curRating>0){
+    setTimeout(()=>{
+      const rMsg=`✦ **Rating received for ${conn.name}:** ${curRating}/5 stars. Thank you for your feedback! ${conn.name} has been automatically notified. ${curRating>=4?'Excellent service recognised! 🏆':'Your feedback helps improve our artisans.'} — Just Ask it will be done for you.`;
+      addMsg('assistant',rMsg,'SYSTEM');
+      speak('Rating sent to '+conn.name+'. Thank you for your feedback.');
+    },600);
+  }
+  showToast('Pop-up sent to '+conn.name+' ✓','s');
+  speak('Message sent to '+conn.name+'.');
+  document.getElementById('pop-text').value='';curRating=0;
+  document.querySelectorAll('#pop-stars .star').forEach(s=>s.textContent='☆');
+  closePopModal();
+  if(!isArtisan){
+    const left=MAX_UU_POPS-popsSentUU;
+    if(left===0)showToast('User-to-user pop-up limit reached','e');
+    else setTimeout(()=>showToast(left+' user-to-user pop-up(s) remaining','s'),1200);
+  }
+}
+
+// ── Language ───────────────────────────────────────────────────────
+function setLang(l){curLang=l;showToast('Language set: '+l.toUpperCase(),'s');}
+
+// ── Voice ──────────────────────────────────────────────────────────
+function toggleVoiceOutput(){voiceOutputOn=!voiceOutputOn;document.getElementById('hd-spk').classList.toggle('muted',!voiceOutputOn);document.getElementById('voice-status').textContent=voiceOutputOn?'🔊 Voice ON':'🔇 Voice OFF';if(voiceOutputOn)speak('Voice reply on.');}
+function speak(text){
+  if(!voiceOutputOn||!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text.replace(/[#*`✦]/g,'').replace(/<[^>]+>/g,'').substring(0,600));
+  u.lang=curLang==='zu'?'zu-ZA':curLang==='af'?'af-ZA':'en-ZA';u.rate=0.9;
+  const voices=window.speechSynthesis.getVoices();
+  const sa=voices.find(v=>v.lang==='en-ZA'||v.name.includes('South'));if(sa)u.voice=sa;
+  window.speechSynthesis.speak(u);
+}
+function toggleVoiceInput(){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){showToast('Voice input not supported','e');return;}
+  if(isRecording){if(recognition)recognition.stop();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition=new SR();recognition.lang=curLang==='zu'?'zu-ZA':'en-ZA';recognition.interimResults=true;
+  recognition.onstart=()=>{isRecording=true;document.getElementById('mic-btn').classList.add('rec');document.getElementById('hd-mic').classList.add('active');showToast('🎤 Listening…','s');};
+  recognition.onresult=(e)=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;const inp=document.getElementById('chat-input');inp.value=t;autoResize(inp);document.getElementById('send-btn').disabled=!t.trim();};
+  recognition.onend=()=>{isRecording=false;document.getElementById('mic-btn').classList.remove('rec');document.getElementById('hd-mic').classList.remove('active');if(document.getElementById('chat-input').value.trim())sendMsg();};
+  recognition.onerror=()=>{isRecording=false;document.getElementById('mic-btn').classList.remove('rec');document.getElementById('hd-mic').classList.remove('active');showToast('Voice error','e');};
+  recognition.start();
+}
+
+// ── Basket ─────────────────────────────────────────────────────────
+function basketTotal(){return basket.reduce((s,i)=>s+i.price,0);}
+function addToBasket(prod){basket.push(prod);saveAllData();renderBasket();showToast('✓ '+prod.name+' added','s');setSTabByName('basket-tab');}
+function removeFromBasket(idx){basket.splice(idx,1);saveAllData();renderBasket();}
+function clearBasket(){basket=[];saveAllData();renderBasket();}
+function checkoutBasket(){if(!basket.length){showToast('Basket is empty','e');return;}speak('Your basket: '+basket.length+' items totalling R'+basketTotal()+'. Thank you!');showToast('Checkout — R'+basketTotal(),'s');}
+function renderBasket(){
+  document.getElementById('basket-total').textContent='R'+basketTotal().toLocaleString();
+  const el=document.getElementById('basket-list');
+  if(!basket.length){el.innerHTML='<div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:14px 0;">Your basket is empty.</div>';return;}
+  el.innerHTML=basket.map((b,i)=>`<div class="bitem"><div class="bico">🎨</div><div class="binfo"><div class="bname">${b.name}</div><div class="bprice">R${b.price.toLocaleString()}</div></div><button class="brm" onclick="removeFromBasket(${i})">✕</button></div>`).join('');
+}
+
+// ── History ────────────────────────────────────────────────────────
+function addHistory(q,a){historyLog.push({q,a:a.substring(0,120),ts:new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'}),date:new Date().toLocaleDateString()});if(historyLog.length>100)historyLog.shift();saveAllData();renderHistory();}
+function renderHistory(){
+  const el=document.getElementById('hist-list');
+  if(!historyLog.length){el.innerHTML='<div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:14px 0;">No history yet.</div>';return;}
+  el.innerHTML=historyLog.slice().reverse().slice(0,20).map((h)=>`<div class="hitem" onclick="quickAsk(${JSON.stringify(h.q)})"><div class="hq">${h.q}</div><div class="ht2">${h.date} ${h.ts} · tap to replay</div></div>`).join('');
+  renderFavs();
+}
+function addToFavs(q){if(!savedFavs.includes(q)){savedFavs.push(q);saveAllData();renderFavs();showToast('Saved to favourites','s');}}
+function renderFavs(){
+  const el=document.getElementById('fav-list');
+  if(!savedFavs.length){el.innerHTML='<div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:8px 0;">No saved items.</div>';return;}
+  el.innerHTML=savedFavs.map((f,i)=>`<div class="hitem" style="border-color:rgba(212,160,23,.18);" onclick="quickAsk(${JSON.stringify(f)})"><div class="qico" style="font-size:10px;">⭐</div><div class="hq">${f}</div></div>`).join('');
+}
+
+// ── Knowledge Base ─────────────────────────────────────────────────
+function handleKBUpload(inp){
+  Array.from(inp.files).forEach(f=>{
+    if(f.type.startsWith('text/')||f.name.endsWith('.txt')){const r=new FileReader();r.onload=e=>{kbEntries.push({type:'text',name:f.name,content:e.target.result.substring(0,3000),date:new Date().toLocaleDateString()});saveAllData();renderKB();};r.readAsText(f);}
+    else{kbEntries.push({type:f.type.startsWith('image/')?'image':f.type.includes('pdf')?'pdf':'file',name:f.name,content:'[File: '+f.name+' · '+formatBytes(f.size)+']',date:new Date().toLocaleDateString()});saveAllData();renderKB();}
+  });
+  inp.value='';showToast('Added to knowledge base','s');
+}
+function saveKBText(){const t=document.getElementById('kb-text').value.trim();if(!t){showToast('Please enter some text','e');return;}kbEntries.push({type:'note',name:'Entry '+new Date().toLocaleString(),content:t,date:new Date().toLocaleDateString()});document.getElementById('kb-text').value='';saveAllData();renderKB();showToast('Knowledge saved','s');}
+function removeKBEntry(i){kbEntries.splice(i,1);saveAllData();renderKB();}
+function renderKB(){
+  document.getElementById('kb-count').textContent=kbEntries.length;
+  const el=document.getElementById('kb-entries');
+  const icons={image:'🖼️',text:'📄',pdf:'📕',file:'📎',note:'📝'};
+  if(!kbEntries.length){el.innerHTML='<div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:10px 0;">No entries yet.</div>';return;}
+  el.innerHTML=kbEntries.map((e,i)=>`<div class="kbfile"><span style="font-size:14px;flex-shrink:0;">${icons[e.type]||'📎'}</span><div style="flex:1;min-width:0;"><div class="kbfile-name">${e.name}</div><div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--mu);">${e.date}</div></div><button class="kbfile-rm" onclick="removeKBEntry(${i})">✕</button></div>`).join('');
+}
+function formatBytes(b){if(b<1024)return b+'B';if(b<1048576)return Math.round(b/1024)+'KB';return (b/1048576).toFixed(1)+'MB';}
+
+// ── Mode ───────────────────────────────────────────────────────────
+function setMode(btn,mode){curMode=mode;document.querySelectorAll('.smb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+
+// ── Message rendering ──────────────────────────────────────────────
+function fmt(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--g)">$1</strong>').replace(/\*(.*?)\*/g,'<em style="color:#fde98a">$1</em>').replace(/`(.*?)`/g,'<code style="background:rgba(212,160,23,.08);padding:1px 4px;border-radius:3px;color:var(--oc);font-family:monospace;font-size:11px;">$1</code>').replace(/\n/g,'<br>');}
+function getTime(){return new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});}
+
+function addMsg(role,text,mode){
+  const msgs=document.getElementById('msgs');
+  const av=curUser?curUser.name[0].toUpperCase():'G';
+  if(role==='error'){msgs.innerHTML+=`<div class="mrow"><div class="mav a">✦</div><div class="mbub"><div class="mbub-inner err">⚠ ${text}</div></div></div>`;}
+  else if(role==='user'){msgs.innerHTML+=`<div class="mrow u"><div class="mav u">${av}</div><div class="mbub"><div class="mbub-inner u">${text.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div><div class="mtime u"><span>${getTime()}</span></div></div></div>`;}
+  else{msgs.innerHTML+=`<div class="mrow"><div class="mav a">✦</div><div class="mbub"><div class="mbub-inner a">${fmt(text)}</div><div class="mtime"><span>${getTime()}</span><span class="mmode">${mode||''}</span><button class="play-btn" onclick="speakText(this)">▶ Play</button><button class="play-btn" style="color:var(--grn);" onclick="addToFavs(${JSON.stringify(text.substring(0,80))})">⭐ Save</button></div></div></div>`;}
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function speakText(btn){const t=btn.closest('.mbub').querySelector('.mbub-inner').textContent;speak(t);}
+function showTyping(){const m=document.getElementById('msgs');m.innerHTML+=`<div class="typing" id="typ"><div class="mav a">✦</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;m.scrollTop=m.scrollHeight;}
+function hideTyping(){const t=document.getElementById('typ');if(t)t.remove();}
+
+// ── Input helpers ──────────────────────────────────────────────────
+function quickAsk(q){const inp=document.getElementById('chat-input');inp.value=q;autoResize(inp);document.getElementById('send-btn').disabled=false;sendMsg();}
+function autoResize(ta){ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,100)+'px';}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!document.getElementById('send-btn').disabled)sendMsg();}}
+function clearChat(){chatHistory=[];userMsgCount=0;saveAllData();document.getElementById('msg-count-left').textContent=MAX_USER_MSGS;initChat();}
+function saveSession(){saveAllData();showToast('Session saved ✓','s');}
+function handleChatAttach(inp){if(!inp.files[0])return;curAttachment=inp.files[0];showToast('📎 Attached: '+curAttachment.name,'s');inp.value='';}
+
+// ── Send message ───────────────────────────────────────────────────
+async function sendMsg(){
+  if(isLoading)return;
+  const inp=document.getElementById('chat-input');const text=inp.value.trim();if(!text)return;
+  // Msg count check (not for artisans/managers/CEO)
+  const role=curUser?curUser.role:'GUEST';
+  if(role==='VOLUNTEER'||role==='GUEST'){
+    if(userMsgCount>=MAX_USER_MSGS){
+      showToast('Chat limit reached ('+MAX_USER_MSGS+'). Please save session and continue later.','e');
+      addMsg('assistant','You have reached your chat session limit of **'+MAX_USER_MSGS+' messages**. To continue chatting, please **save your session** and start a new one. Your history is preserved. — *Just Ask it will be done for you.*','SYSTEM');
+      speak('You have reached your chat limit. Please save your session to continue.');
+      return;
+    }
+    userMsgCount++;saveAllData();
+    const left=MAX_USER_MSGS-userMsgCount;
+    document.getElementById('msg-count-left').textContent=left;
+    if(left<=2&&left>0)showToast(left+' chat message(s) remaining this session','e');
+  }
+  inp.value='';inp.style.height='auto';document.getElementById('send-btn').disabled=true;
+  const wb=document.querySelector('.wb');if(wb)wb.remove();
+  addMsg('user',text);chatHistory.push({role:'user',content:text});
+  isLoading=true;showTyping();
+  // Context building
+  const kbCtx=kbEntries.length?'\n\nKNOWLEDGE BASE:\n'+kbEntries.map(e=>e.content).join('\n---\n').substring(0,2000):'';
+  const basketCtx=basket.length?'\n\nUSER BASKET: '+basket.map(b=>b.name+' R'+b.price).join(', '):'';
+  const histCtx=historyLog.length?'\n\nCHAT HISTORY SUMMARY (last 5):\n'+historyLog.slice(-5).map(h=>`Q: ${h.q} | A: ${h.a}`).join('\n'):'';
+  const connCtx=connections.length?'\n\nUSER CONNECTIONS: '+connections.map(c=>c.name+' ('+c.rel+'/'+c.role+(c.dob?', DOB:'+c.dob:'')+')').join(', '):'';
+  const userCtx=curUser?`\n\nCURRENT USER: ${curUser.name} (${curUser.role}), Lang: ${curLang}`:'';
+  const modeCtx='\n\nRESPONSE MODE: '+curMode;
+  const langCtx=curLang!=='en'?'\n\nUSER LANGUAGE PREFERENCE: '+curLang+'. If they ask for translation or if their message is in another language, respond in that language.':'';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:1000,
+      system:SYSTEM_PROMPT+userCtx+kbCtx+basketCtx+histCtx+connCtx+modeCtx+langCtx,
+      messages:chatHistory,
+      tools:[{type:'web_search_20250305',name:'web_search'}]
+    })});
+    const d=await res.json();
+    const reply=d.content?.filter(c=>c.type==='text').map(c=>c.text).join('\n')||'I am here with you. Just Ask.';
+    chatHistory.push({role:'assistant',content:reply});
+    hideTyping();addMsg('assistant',reply,curMode);addHistory(text,reply);
+    // Product detection
+    const matched=products.filter(p=>reply.toLowerCase().includes(p.name.toLowerCase()));
+    if(matched.length){
+      const msgs=document.getElementById('msgs');
+      msgs.innerHTML+=`<div class="prod-row">${matched.map(p=>`<div class="prod-chip" onclick="addToBasket({id:'${p.id}',name:'${p.name}',price:${p.price}})"><div class="pc-name">${p.name}</div><div class="pc-price">R${p.price.toLocaleString()}</div><div class="pc-add">+ Add to basket</div></div>`).join('')}</div>`;
+      msgs.scrollTop=msgs.scrollHeight;
+    }
+    if(voiceOutputOn)speak(reply.replace(/<[^>]+>/g,'').substring(0,500));
+  }catch(err){hideTyping();addMsg('error','Connection error. Please check internet and try again.');}
+  isLoading=false;curAttachment=null;
+}
+
+// ── System Prompt ──────────────────────────────────────────────────
+const SYSTEM_PROMPT=`You are Ask Matriks AI — the trusted community intelligence of Bulelani Living Stone Foundation (BLSF) and Freedom Brands (FHCB), Ward 11, Seshego Township, Polokwane, Limpopo, South Africa. You were built by Stanley Sivhabu (Mr South Africa 103). You answer questions for BOTH organisations.
+
+CORE IDENTITY:
+- Greeting: "Hi [name], welcome to Ask Matriks AI for Bulelani Foundation and Freedom Brands. I can give answers to both these organisations."
+- Closing: Always end with "Just Ask — it will be done for you."
+- Philosophy: "I am you in me and you are me in you." (MeInThem principle)
+- Theme: God's Kingdom — A Crowded Room.
+- You know what the user wants. They just Ask. Lead with the answer.
+
+RESPONSE LENGTH RULES:
+- SHORT queries (on-the-go, quick info): Precise, no elaboration. Numbers only if numbers asked. Direct answer then "Just Ask."
+- LONG queries (education, planning, deep questions): Elaborate, suggest related products/services, apply MeInThem philosophy.
+- NUMBERS/MATHS: Act like a calculator. Give precise numbers. Clear display for older users. Suggest next steps after numbers. Format: R1,234.56 (South African format). Read bank statements, receipts — arrange by date. Advise on stock quantities, budgets, margins.
+- TRANSLATION: Translate to/from all 13 SA languages + Sign Language description. Be accurate.
+
+ORGANISATION KNOWLEDGE:
+BLSF = Bulelani Living Stone Foundation. Communal crime prevention + economic development. Ward 11, Seshego. 12-week campaign. 4,000 houses target. R800K target.
+FHCB = Freedom Brands. Artisan products. 90% revenue to artisans.
+
+FHCB PRODUCTS: My-Holder Mini Max (R100, Xhalisile Ishmael Mayo), My-Holder Mini (R200, Mbulelo Gladman Mayo), Table Stacks (R120, Palesa Nqula), Photo Frame Collage (R350, Nomonde Albertina Sivhabu), Mirror Africa (R180, Khethiwe Constance Mangwwe), Royal Shweshwe Tapestry (R1,450 luxury), Hand-Carved Ebony Big Five (R2,800 luxury), Ndebele Heritage Neckpiece (R850 luxury).
+
+MANAGEMENT:
+- CEO / Founder: Stanley Sivhabu (Mr South Africa 103) — stanley@blsf.org
+- Manager: Mbulelo Gladman Mayo — mbulelo@blsf.org
+- Volunteer: William Makoro — william@blsf.org
+
+1949 PROGRAMME OF ACTION SYLLABUS:
+1946: Labour is Leverage → 1956: Organisation is Strength → 1976: Innovation → 1986: Brand Survival → 1996: IP Protection → 2006: Grassroots Management → 2016: Collaboration → 2026: Economic Freedom.
+SelfID Framework: MeIDmE (how you see yourself), MeIDThem (how others see you), MeINthem (your presence inside others — the principle guiding all responses).
+
+POP-UP MESSAGES (you can suggest and guide users):
+- Users can send pop-up messages (greetings, stickers, emojis, ratings) to LINKED people only.
+- User→User: Limited to 3 pop-ups per session. Remind of remaining count.
+- User→Artisan: Unlimited pop-ups. Artisans receive auto-notification of ratings.
+- Relationships/connection types: Friend, Sibling, Brother, Sister, Aunt, Uncle, Parent, Child, Colleague, Neighbour, Artisan, Manager.
+- Birthdays: If you know a connection's birthday, proactively remind user and suggest sending a pop-up.
+- Suggest pop-up messages naturally during conversation when appropriate.
+- This is NOT a social chat platform. Remind users politely.
+
+CHAT LIMITS: Volunteers/Guests: 5 messages per session. Remind before limit. Artisans/Managers/CEO: Unlimited.
+
+NUMBERS & MATHS GUIDANCE:
+- Act as a precise calculator for all financial queries.
+- Present numbers clearly and large for older users. Example: "TOTAL: R 1,250.00"
+- For stock: suggest quantities based on budget (e.g. "With R500 you can buy 5x My-Holder Mini Max at R100 each. That leaves R0 change.").
+- For bank statements/receipts: sort by date, show totals, flag anomalies.
+- For margins: calculate artisan's 90% share precisely.
+
+TRANSPARENCY: Users depend on you for full transparency about both organisations. Share artisan names, prices, management info freely and honestly.
+
+LANGUAGE: South Africa has 13 official languages + Sign Language. Translate accurately. Detect language preference and adjust.
+
+LOCAL POLOKWANE SUPPLIERS (always guide users here):
+HARDWARE: Builders Warehouse (N1 City), Cashbuild (Seshego & CBD), Makro Building, PPC Cement dealers.
+MANUFACTURERS: LEDA (Limpopo Economic Development Agency), Polokwane Industrial Area.
+FARMERS/FOOD: Polokwane Fresh Produce Market (Landdros Mare St), Seshego informal markets, Limpopo Agri Hub.
+LOGISTICS: Fastway Couriers, RAM Hand-to-Hand, Dawn Wing, DSV Polokwane, The Courier Guy.
+SUPPLIERS: Makro Polokwane, Wholesale City, Trade Centre Seshego.
+Always suggest: https://maps.google.com/?q=[place+Polokwane] and www.yellowpages.co.za
+Use web_search to find current contacts/prices when needed.
+
+HISTORY: Users can pull up their full chat history for reference. Help them recall, search, and replay past sessions. Sessions are saved by date.
+
+WORKING & SELF-EMPLOYMENT: Encourage self-employment and entrepreneurship. Help artisans find suppliers, calculate costs, set prices, understand their 90% share.
+
+Remember: You only answer questions about BLSF and FHCB. For external needs (hardware, suppliers, logistics), you guide and refer users to appropriate external resources. Stanley Sivhabu (Mr South Africa 103) is your creator and CEO. Treat him with full CEO access and respect.`;
+
+// ── Drag & drop KB ─────────────────────────────────────────────────
+const dz=document.getElementById('kb-dropzone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.style.borderColor='rgba(212,160,23,.6)';});
+dz.addEventListener('dragleave',()=>{dz.style.borderColor='';});
+dz.addEventListener('drop',e=>{e.preventDefault();dz.style.borderColor='';if(e.dataTransfer.files.length)handleKBUpload({files:e.dataTransfer.files,value:''});});
+
+// ── Toast ──────────────────────────────────────────────────────────
+let tt;function showToast(msg,type){const t=document.getElementById('toast');t.textContent=(type==='s'?'✓ ':'⚠ ')+msg;t.className='toast '+type+' show';clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3200);}
+
+if(window.speechSynthesis)window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
+// Auto-init chat on load
+window.addEventListener('DOMContentLoaded',()=>{curUser={id:1,name:'Stanley Sivhabu',role:'CEO',email:'stanley@blsf.org',dob:'1975-06-16',lang:'en',ref:'FHCB-2026-CEO-001',status:'Active'};loadUserData();updateChatUser();initChat();});
+</script>
+</body>
+</html>

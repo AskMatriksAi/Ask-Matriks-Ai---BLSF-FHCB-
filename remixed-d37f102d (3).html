@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask Matriks AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--e:#1a1208;--d:#2d1f0e;--tc:#c4622d;--oc:#d4a017;--g:#f0c040;--cr:#f5ead0;--ash:#e8dcc8;--mu:#7a6a54;--grn:#4a7c59;--red:#8b2020;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:'Crimson Pro',Georgia,serif;background:var(--e);color:var(--cr);}
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
+#chat.active{display:grid;grid-template-columns:260px 1fr;height:100vh;overflow:hidden;}
+.stripe{height:5px;background:repeating-linear-gradient(90deg,var(--red) 0,var(--red) 10px,var(--oc) 10px,var(--oc) 20px,var(--e) 20px,var(--e) 30px,var(--tc) 30px,var(--tc) 40px,var(--e) 40px,var(--e) 50px);}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border:none;border-radius:10px;cursor:pointer;font-family:'Crimson Pro',serif;font-size:15px;font-weight:600;transition:all .2s;}
+.btn-p{background:linear-gradient(135deg,var(--tc),var(--oc));color:#fff;}
+.btn-g{background:transparent;border:1px solid rgba(212,160,23,.3);color:var(--ash);}
+.btn-sm{padding:7px 14px;font-size:13px;border-radius:8px;}
+.fi{width:100%;padding:11px 13px;background:rgba(45,31,14,.7);border:1px solid rgba(212,160,23,.22);border-radius:8px;color:var(--cr);font-family:'Crimson Pro',serif;font-size:15px;outline:none;}
+.fi:focus{border-color:rgba(212,160,23,.5);}
+.fi option{background:var(--d);}
+.fl{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--oc);margin-bottom:6px;}
+.fg{margin-bottom:14px;}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;}
+.b-CEO{background:rgba(240,192,64,.15);border:1px solid rgba(240,192,64,.35);color:var(--g);}
+.b-MANAGER{background:rgba(74,124,89,.15);border:1px solid rgba(74,124,89,.35);color:#7ec49a;}
+.b-VOLUNTEER{background:rgba(42,95,143,.15);border:1px solid rgba(42,95,143,.35);color:#7ab0e0;}
+.b-ARTISAN{background:rgba(196,98,45,.15);border:1px solid rgba(196,98,45,.35);color:var(--tc);}
+.toast{position:fixed;bottom:22px;right:22px;z-index:999;background:var(--d);border-radius:10px;padding:12px 18px;font-family:'Space Mono',monospace;font-size:11px;box-shadow:0 8px 28px rgba(0,0,0,.5);transform:translateY(20px);opacity:0;transition:all .28s;pointer-events:none;max-width:300px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.s{border:1px solid rgba(74,124,89,.4);color:#7ec49a;}
+.toast.e{border:1px solid rgba(139,32,32,.4);color:#e07070;}
+.modal{position:fixed;inset:0;background:rgba(8,4,1,.9);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.modal.open{display:flex;}
+.modal-box{background:var(--d);border:1px solid rgba(212,160,23,.3);border-radius:16px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:14px;right:16px;background:transparent;border:none;color:var(--mu);font-size:18px;cursor:pointer;}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--g);margin-bottom:5px;}
+.modal-sub{font-size:12px;color:var(--mu);font-style:italic;margin-bottom:18px;}
+.popup-notif{position:fixed;bottom:80px;right:22px;z-index:180;background:var(--d);border:1px solid rgba(212,160,23,.3);border-radius:14px;padding:16px 18px;max-width:300px;box-shadow:0 12px 40px rgba(0,0,0,.6);animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.popup-from{font-family:'Space Mono',monospace;font-size:8px;color:var(--tc);text-transform:uppercase;margin-bottom:5px;}
+.popup-body{font-size:13px;color:var(--cr);line-height:1.5;margin-bottom:8px;}
+.popup-close-btn{background:transparent;border:none;color:var(--mu);font-size:11px;cursor:pointer;font-family:'Space Mono',monospace;}
+.sticker-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0;}
+.sticker{font-size:22px;text-align:center;padding:5px;border-radius:8px;cursor:pointer;background:rgba(45,31,14,.5);border:1px solid rgba(212,160,23,.1);transition:all .15s;}
+.sticker:hover,.sticker.sel{border-color:var(--tc);background:rgba(196,98,45,.15);}
+.rating-stars{display:flex;gap:8px;justify-content:center;margin:10px 0;}
+.star{font-size:24px;cursor:pointer;opacity:.3;transition:all .15s;}
+.star.on{opacity:1;}
+.rel-btn{padding:5px 11px;background:rgba(45,31,14,.6);border:1px solid rgba(212,160,23,.14);border-radius:14px;color:var(--ash);font-size:11.5px;cursor:pointer;transition:all .15s;margin:2px;}
+.rel-btn.sel{border-color:var(--tc);background:rgba(196,98,45,.12);color:var(--g);}
+/* SIDEBAR */
+.csb{background:var(--d);border-right:1px solid rgba(212,160,23,.16);display:flex;flex-direction:column;overflow:hidden;position:relative;}
+.csb::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--tc),var(--oc),var(--g));}
+.csb-top{padding:16px 14px 10px;border-bottom:1px solid rgba(212,160,23,.1);}
+.csb-logo{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.csb-ico{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--tc),var(--oc));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.csb-nt{font-family:'Playfair Display',serif;font-size:13px;font-weight:900;color:var(--g);}
+.csb-ns{font-family:'Space Mono',monospace;font-size:7px;color:var(--mu);letter-spacing:.1em;text-transform:uppercase;}
+.csb-user{background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.14);border-radius:7px;padding:7px 10px;display:flex;align-items:center;gap:7px;}
+.udot{width:6px;height:6px;background:var(--grn);border-radius:50%;flex-shrink:0;}
+.uname{font-family:'Space Mono',monospace;font-size:8px;color:var(--oc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.csb-tabs{display:flex;border-bottom:1px solid rgba(212,160,23,.09);}
+.ctab{flex:1;padding:8px 2px;background:transparent;border:none;color:var(--mu);font-family:'Space Mono',monospace;font-size:9px;cursor:pointer;border-bottom:2px solid transparent;transition:all .17s;}
+.ctab.on{color:var(--g);border-bottom-color:var(--tc);}
+.stab{display:none;flex:1;flex-direction:column;overflow-y:auto;}
+.stab.on{display:flex;}
+.csec{padding:10px 14px 5px;}
+.slbl{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:7px;}
+.smb{display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;background:transparent;border:1px solid transparent;border-radius:6px;color:var(--ash);font-family:'Crimson Pro',serif;font-size:12.5px;cursor:pointer;text-align:left;margin-bottom:2px;transition:all .17s;}
+.smb.on{background:rgba(196,98,45,.13);border-color:rgba(196,98,45,.36);color:var(--g);}
+.sdot{width:5px;height:5px;border-radius:50%;background:var(--mu);flex-shrink:0;}
+.smb.on .sdot{background:var(--tc);}
+.sdiv{height:1px;background:rgba(212,160,23,.08);margin:8px 14px;}
+.sqlinks{padding:0 14px;}
+.slnk{display:flex;align-items:center;gap:7px;width:100%;padding:6px 8px;background:transparent;border:none;border-radius:6px;color:var(--ash);font-family:'Crimson Pro',serif;font-size:12px;cursor:pointer;text-align:left;margin-bottom:1px;transition:all .15s;}
+.slnk:hover{background:rgba(212,160,23,.06);color:var(--cr);}
+.conn-wrap{padding:10px 14px;flex:1;overflow-y:auto;}
+.conn-card{display:flex;align-items:center;gap:8px;padding:8px;background:rgba(45,31,14,.5);border:1px solid rgba(212,160,23,.1);border-radius:9px;margin-bottom:6px;}
+.conn-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--tc),var(--oc));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.conn-name{font-size:12px;color:var(--cr);font-weight:600;}
+.conn-rel{font-family:'Space Mono',monospace;font-size:7px;color:var(--oc);text-transform:uppercase;}
+.conn-msg-btn{background:rgba(196,98,45,.12);border:1px solid rgba(196,98,45,.25);border-radius:6px;padding:3px 7px;color:var(--tc);font-size:10px;cursor:pointer;white-space:nowrap;margin-left:auto;}
+.basket-wrap{padding:10px 14px;flex:1;overflow-y:auto;}
+.bitem{display:flex;align-items:center;gap:8px;padding:8px;background:rgba(45,31,14,.5);border:1px solid rgba(212,160,23,.1);border-radius:8px;margin-bottom:6px;}
+.binfo{flex:1;min-width:0;}
+.bname{font-size:12px;color:var(--cr);font-weight:600;}
+.bprice{font-family:'Space Mono',monospace;font-size:10px;color:var(--g);}
+.brm{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:13px;}
+.btotal{background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.14);border-radius:7px;padding:9px 12px;text-align:center;margin-bottom:8px;}
+.btlbl{font-family:'Space Mono',monospace;font-size:8px;color:var(--mu);text-transform:uppercase;margin-bottom:3px;}
+.btamt{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--g);}
+.num-wrap{padding:10px 14px;flex:1;overflow-y:auto;}
+.calc-display{background:rgba(45,31,14,.8);border:1px solid rgba(212,160,23,.2);border-radius:9px;padding:12px 14px;margin-bottom:10px;text-align:right;}
+.calc-expr{font-family:'Space Mono',monospace;font-size:10px;color:var(--mu);min-height:14px;}
+.calc-result{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--g);}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px;}
+.calc-btn{padding:10px 5px;background:rgba(45,31,14,.6);border:1px solid rgba(212,160,23,.12);border-radius:7px;color:var(--ash);font-family:'Space Mono',monospace;font-size:12px;cursor:pointer;text-align:center;transition:all .15s;}
+.calc-btn:hover{background:rgba(212,160,23,.1);}
+.calc-btn.op{color:var(--oc);}
+.calc-btn.eq{background:linear-gradient(135deg,var(--tc),var(--oc));color:#fff;border:none;}
+.calc-btn.clr{color:#e07070;}
+.hist-wrap{padding:10px 14px;flex:1;overflow-y:auto;}
+.hitem{padding:8px;background:rgba(45,31,14,.5);border:1px solid rgba(212,160,23,.09);border-radius:7px;margin-bottom:5px;cursor:pointer;}
+.hitem:hover{border-color:rgba(212,160,23,.22);}
+.hq{font-size:11.5px;color:var(--ash);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ht2{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);margin-top:2px;}
+.kb-wrap{padding:10px 14px;flex:1;overflow-y:auto;}
+.kbf{border:2px dashed rgba(212,160,23,.2);border-radius:9px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px;}
+.kbf:hover{border-color:rgba(212,160,23,.4);}
+.kbfile{display:flex;align-items:center;gap:8px;padding:7px;background:rgba(45,31,14,.6);border:1px solid rgba(212,160,23,.1);border-radius:7px;margin-bottom:5px;}
+.kbfile-name{font-size:11px;color:var(--ash);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kbfile-rm{background:transparent;border:none;color:var(--mu);cursor:pointer;font-size:12px;}
+.sfoot{padding:10px 14px;border-top:1px solid rgba(212,160,23,.08);}
+.sfrow{display:flex;gap:5px;}
+.sfb{flex:1;padding:6px;background:transparent;border:1px solid rgba(212,160,23,.13);border-radius:6px;color:var(--mu);font-family:'Space Mono',monospace;font-size:7px;text-transform:uppercase;cursor:pointer;transition:all .17s;}
+.sfb:hover{border-color:rgba(212,160,23,.28);color:var(--ash);}
+/* MAIN CHAT */
+.cmain{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.chdr{padding:10px 20px;border-bottom:1px solid rgba(212,160,23,.12);background:rgba(26,18,8,.9);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ctit{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--cr);}
+.ctit em{color:var(--g);font-style:italic;}
+.cpill{font-family:'Space Mono',monospace;font-size:7.5px;padding:3px 8px;border-radius:13px;text-transform:uppercase;}
+.pw{background:rgba(74,124,89,.13);border:1px solid rgba(74,124,89,.3);color:#7ec49a;}
+.pl{background:rgba(196,98,45,.13);border:1px solid rgba(196,98,45,.3);color:var(--tc);display:flex;align-items:center;gap:4px;}
+.blink{width:5px;height:5px;background:var(--tc);border-radius:50%;animation:bl 1.5s infinite;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+.vc-btn{width:30px;height:30px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;}
+.vc-mic{background:rgba(196,98,45,.13);border:1px solid rgba(196,98,45,.3);color:var(--tc);}
+.vc-mic.active{background:rgba(196,98,45,.35);}
+.vc-spk{background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.22);color:var(--oc);}
+.vc-spk.muted{opacity:.45;}
+.lang-sel{background:rgba(45,31,14,.7);border:1px solid rgba(212,160,23,.2);border-radius:7px;color:var(--oc);font-family:'Space Mono',monospace;font-size:9px;padding:3px 6px;cursor:pointer;outline:none;}
+.msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+.msgs::-webkit-scrollbar{width:3px;}
+.msgs::-webkit-scrollbar-thumb{background:rgba(212,160,23,.17);border-radius:2px;}
+.wb{background:linear-gradient(135deg,rgba(45,31,14,.76),rgba(196,98,45,.08));border:1px solid rgba(212,160,23,.16);border-radius:14px;padding:22px;position:relative;overflow:hidden;}
+.wb::before{content:'';position:absolute;top:-1px;left:18%;right:18%;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent);}
+.wb-ey{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--tc);margin-bottom:7px;}
+.wb-t{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--g);margin-bottom:4px;}
+.wb-s{font-size:13px;color:var(--mu);font-style:italic;margin-bottom:16px;}
+.recap{background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.13);border-radius:8px;padding:10px 13px;margin-bottom:14px;font-size:12px;color:var(--ash);line-height:1.6;}
+.qgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.qbtn{background:rgba(212,160,23,.05);border:1px solid rgba(212,160,23,.14);border-radius:8px;padding:9px;color:var(--ash);font-family:'Crimson Pro',serif;font-size:11px;cursor:pointer;text-align:left;line-height:1.35;transition:all .2s;}
+.qbtn:hover{background:rgba(196,98,45,.09);border-color:rgba(196,98,45,.3);}
+.qico{font-size:13px;display:block;margin-bottom:2px;}
+.mrow{display:flex;gap:10px;align-items:flex-start;}
+.mrow.u{flex-direction:row-reverse;}
+.mav{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.mav.a{background:linear-gradient(135deg,var(--tc),var(--oc));color:#fff;}
+.mav.u{background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.22);color:var(--oc);}
+.mbub{flex:1;max-width:620px;}
+.mbub-inner{border-radius:12px;padding:11px 15px;line-height:1.65;font-size:13.5px;color:var(--cr);}
+.mbub-inner.a{background:rgba(45,31,14,.72);border:1px solid rgba(212,160,23,.11);border-top-left-radius:3px;}
+.mbub-inner.u{background:rgba(196,98,45,.15);border:1px solid rgba(196,98,45,.26);border-top-right-radius:3px;}
+.mbub-inner.err{background:rgba(139,32,32,.12);border:1px solid rgba(139,32,32,.28);color:#e07070;font-family:'Space Mono',monospace;font-size:11px;}
+.mtime{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);margin-top:4px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.mtime.u{justify-content:flex-end;}
+.mmode{padding:1px 5px;background:rgba(196,98,45,.09);border:1px solid rgba(196,98,45,.2);border-radius:6px;color:var(--tc);}
+.play-btn{background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);border-radius:5px;padding:2px 7px;color:var(--oc);cursor:pointer;font-size:10px;font-family:'Space Mono',monospace;}
+.prod-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px;}
+.prod-chip{background:rgba(45,31,14,.8);border:1px solid rgba(212,160,23,.18);border-radius:8px;padding:8px 10px;min-width:110px;cursor:pointer;transition:all .2s;}
+.prod-chip:hover{border-color:rgba(212,160,23,.4);}
+.pc-name{font-size:11px;color:var(--cr);font-weight:600;margin-bottom:2px;}
+.pc-price{font-family:'Space Mono',monospace;font-size:11px;color:var(--g);}
+.pc-add{font-size:9px;color:var(--tc);font-family:'Space Mono',monospace;}
+.typing{display:flex;gap:10px;align-items:center;}
+.dots{display:flex;gap:5px;padding:10px 14px;background:rgba(45,31,14,.72);border:1px solid rgba(212,160,23,.11);border-radius:12px 12px 12px 3px;}
+.dot{width:5px;height:5px;background:var(--oc);border-radius:50%;}
+.dot:nth-child(1){animation:bc 1.2s 0s infinite;}
+.dot:nth-child(2){animation:bc 1.2s .2s infinite;}
+.dot:nth-child(3){animation:bc 1.2s .4s infinite;}
+@keyframes bc{0%,80%,100%{transform:translateY(0);opacity:.3}40%{transform:translateY(-6px);opacity:1}}
+.cinput{padding:11px 20px 14px;border-top:1px solid rgba(212,160,23,.12);background:rgba(26,18,8,.92);flex-shrink:0;}
+.cinwrap{display:flex;gap:8px;align-items:flex-end;background:rgba(45,31,14,.58);border:1px solid rgba(212,160,23,.18);border-radius:12px;padding:8px 11px;}
+.cinwrap textarea{flex:1;background:transparent;border:none;outline:none;color:var(--cr);font-family:'Crimson Pro',serif;font-size:14px;line-height:1.5;resize:none;max-height:100px;overflow-y:auto;}
+.cinwrap textarea::placeholder{color:var(--mu);font-style:italic;}
+.cin-btns{display:flex;gap:5px;align-items:center;flex-shrink:0;}
+.ic-btn{width:33px;height:33px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .2s;flex-shrink:0;}
+.ic-att{background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.18);color:var(--oc);}
+.ic-mic{background:rgba(196,98,45,.1);border:1px solid rgba(196,98,45,.25);color:var(--tc);}
+.ic-mic.rec{background:rgba(196,98,45,.35);}
+.ic-send{background:linear-gradient(135deg,var(--tc),var(--oc));color:#fff;}
+.ic-send:disabled{opacity:.4;cursor:not-allowed;}
+.chint{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);margin-top:5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+/* AUTH */
+#auth{overflow-y:auto;}
+.awrap{min-height:100vh;display:flex;}
+.aleft{flex:1;display:flex;flex-direction:column;justify-content:center;padding:50px;background:rgba(45,31,14,.32);border-right:1px solid rgba(212,160,23,.1);}
+.aleft h2{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--g);line-height:1.1;margin-bottom:11px;}
+.aleft h2 em{display:block;font-style:italic;font-size:26px;color:var(--cr);}
+.aleft p{font-size:14px;color:var(--mu);line-height:1.7;max-width:320px;margin-bottom:22px;}
+.pledge{background:rgba(196,98,45,.08);border-left:3px solid var(--tc);border-radius:0 7px 7px 0;padding:13px 16px;font-style:italic;font-size:12.5px;color:var(--ash);line-height:1.65;max-width:350px;}
+.pledge cite{display:block;font-size:9.5px;font-style:normal;color:var(--mu);margin-top:6px;font-family:'Space Mono',monospace;}
+.aright{width:440px;flex-shrink:0;display:flex;flex-direction:column;padding:36px 44px;overflow-y:auto;}
+.back-lnk{display:inline-flex;align-items:center;gap:5px;background:transparent;border:none;color:var(--mu);font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;margin-bottom:22px;}
+.atabs{display:flex;border:1px solid rgba(212,160,23,.18);border-radius:9px;overflow:hidden;margin-bottom:22px;}
+.atab{flex:1;padding:10px;background:transparent;border:none;color:var(--mu);font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .18s;}
+.atab.on{background:rgba(196,98,45,.14);color:var(--g);}
+.aform{display:none;}
+.aform.on{display:block;}
+.aform h3{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--cr);margin-bottom:3px;}
+.aform .sub{font-size:12.5px;color:var(--mu);font-style:italic;margin-bottom:18px;}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:13px;}
+.ropt{background:rgba(45,31,14,.5);border:2px solid rgba(212,160,23,.12);border-radius:9px;padding:10px;cursor:pointer;transition:all .18s;text-align:center;user-select:none;}
+.ropt.sel{border-color:var(--tc);background:rgba(196,98,45,.12);}
+.ri{font-size:17px;display:block;margin-bottom:3px;}
+.rl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.09em;text-transform:uppercase;color:var(--ash);}
+.ropt.sel .rl{color:var(--g);}
+.coderow{display:none;margin-bottom:12px;}
+.hint{font-size:10.5px;color:var(--mu);margin-top:3px;font-style:italic;}
+.agree{background:rgba(212,160,23,.06);border:1px solid rgba(212,160,23,.13);border-radius:7px;padding:9px 11px;margin-bottom:14px;font-size:11.5px;color:var(--mu);line-height:1.5;}
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--mu);font-size:10.5px;font-family:'Space Mono',monospace;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(212,160,23,.12);}
+.dhint{margin-top:16px;background:rgba(212,160,23,.05);border:1px solid rgba(212,160,23,.13);border-radius:7px;padding:10px 12px;font-family:'Space Mono',monospace;font-size:9.5px;color:var(--mu);line-height:1.7;}
+/* HOME */
+#home{overflow-y:auto;}
+.hnav{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:13px 40px;background:rgba(26,18,8,.94);backdrop-filter:blur(12px);border-bottom:1px solid rgba(212,160,23,.1);}
+.nlogo{display:flex;align-items:center;gap:10px;}
+.nico{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--tc),var(--oc));display:flex;align-items:center;justify-content:center;font-size:15px;}
+.ntit{font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:var(--g);}
+.nsub{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);letter-spacing:.14em;text-transform:uppercase;}
+.hero{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(48px,8vw,84px);font-weight:900;line-height:.97;color:var(--cr);margin-bottom:11px;}
+.hero h1 em{color:var(--g);font-style:italic;}
+.ht{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--tc);margin-bottom:16px;padding:4px 12px;border:1px solid rgba(196,98,45,.22);border-radius:18px;background:rgba(196,98,45,.06);display:inline-block;}
+.hs{font-size:17px;color:var(--ash);font-style:italic;max-width:500px;line-height:1.65;margin:0 auto 10px;}
+.hacts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;}
+.hstats{display:flex;border:1px solid rgba(212,160,23,.14);border-radius:12px;overflow:hidden;background:rgba(45,31,14,.5);}
+.hsi{padding:15px 24px;text-align:center;border-right:1px solid rgba(212,160,23,.1);}
+.hsi:last-child{border-right:none;}
+.hsin{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--g);}
+.hsil{font-family:'Space Mono',monospace;font-size:7.5px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
+.psec{padding:50px 40px 60px;max-width:1060px;margin:0 auto;}
+.psec h2{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--cr);text-align:center;margin-bottom:6px;}
+.psec p{font-size:14px;color:var(--mu);text-align:center;font-style:italic;margin-bottom:28px;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:11px;}
+.pcard{background:rgba(45,31,14,.5);border:1px solid rgba(212,160,23,.1);border-radius:10px;padding:14px;}
+.pcard.lux{background:rgba(212,160,23,.05);border-color:rgba(212,160,23,.22);}
+.pn{font-family:'Playfair Display',serif;font-size:13.5px;font-weight:700;color:var(--cr);margin-bottom:2px;}
+.pcard.lux .pn{color:var(--g);}
+.pc2{font-size:11.5px;color:var(--mu);margin-bottom:7px;font-style:italic;}
+.pp{font-family:'Space Mono',monospace;font-size:13px;color:var(--g);font-weight:700;}
+.hfooter{border-top:1px solid rgba(212,160,23,.1);padding:20px 40px;display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:8.5px;color:var(--mu);flex-wrap:wrap;gap:6px;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- POPUP MODAL -->
+<div class="modal" id="popup-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">✉ Send Pop-Up Message</div>
+    <div class="modal-sub">Send to a linked community member</div>
+    <div class="fg">
+      <label class="fl">Recipient</label>
+      <select class="fi" id="popup-recipient" onchange="checkPopupLimit()">
+        <option value="">Choose linked person…</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label class="fl">Message Type</label>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">
+        <button class="rel-btn sel" onclick="selMsgType(this,'greeting')">👋 Greeting</button>
+        <button class="rel-btn" onclick="selMsgType(this,'thanks')">🙏 Thank You</button>
+        <button class="rel-btn" onclick="selMsgType(this,'rating')">⭐ Rating</button>
+        <button class="rel-btn" onclick="selMsgType(this,'birthday')">🎂 Birthday</button>
+        <button class="rel-btn" onclick="selMsgType(this,'sticker')">🎨 Sticker</button>
+      </div>
+    </div>
+    <div id="popup-rating-row" style="display:none;margin-bottom:12px;">
+      <label class="fl">Rate this Artisan</label>
+      <div class="rating-stars" id="rating-stars">
+        <span class="star" onclick="setRating(1)">⭐</span>
+        <span class="star" onclick="setRating(2)">⭐</span>
+        <span class="star" onclick="setRating(3)">⭐</span>
+        <span class="star" onclick="setRating(4)">⭐</span>
+        <span class="star" onclick="setRating(5)">⭐</span>
+      </div>
+      <div id="rating-val" style="text-align:center;font-family:'Space Mono',monospace;font-size:10px;color:var(--oc);">Tap a star</div>
+    </div>
+    <div id="popup-sticker-row" style="display:none;margin-bottom:12px;">
+      <label class="fl">Choose Sticker</label>
+      <div class="sticker-grid" id="sticker-picker"></div>
+    </div>
+    <div class="fg">
+      <label class="fl">Message</label>
+      <textarea class="fi" id="popup-text" rows="3" placeholder="Type your message…" style="resize:vertical;font-size:13px;"></textarea>
+    </div>
+    <div id="popup-warn" style="display:none;font-family:'Space Mono',monospace;font-size:9px;color:var(--oc);background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.2);border-radius:7px;padding:7px 10px;margin-bottom:10px;"></div>
+    <button class="btn btn-p" style="width:100%;justify-content:center;" onclick="sendPopupMsg()">✦ Send Pop-Up Message</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="page">
+  <div class="stripe"></div>
+  <nav class="hnav">
+    <div class="nlogo">
+      <div class="nico">✦</div>
+      <div><div class="ntit">Ask Matriks AI</div><div class="nsub">BLSF + Freedom Brands</div></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-g btn-sm" onclick="goTo('auth','login')">Sign In</button>
+      <button class="btn btn-p btn-sm" onclick="goTo('auth','signup')">Join Now</button>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="ht">Bulelani Foundation · Freedom Brands · Ward 11 · 2026</div>
+    <h1>Ask<br><em>Matriks</em></h1>
+    <p class="hs">"I am you in me and you are me in you."</p>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:var(--mu);margin-bottom:28px;">God's Kingdom — A Crowded Room</div>
+    <div class="hacts">
+      <button class="btn btn-p" onclick="goTo('auth','signup')">✦ Join the Movement</button>
+      <button class="btn btn-g" onclick="goTo('chat')">Just Ask →</button>
+    </div>
+    <div class="hstats">
+      <div class="hsi"><div class="hsin">4,000</div><div class="hsil">Houses</div></div>
+      <div class="hsi"><div class="hsin">R800K</div><div class="hsil">Target</div></div>
+      <div class="hsi"><div class="hsin">90%</div><div class="hsil">Artisan Rev.</div></div>
+      <div class="hsi"><div class="hsin">13</div><div class="hsil">Languages</div></div>
+    </div>
+  </div>
+  <div class="psec">
+    <h2>FHCB Products</h2>
+    <p>Every purchase funds Ward 11. Every artisan earns 90%.</p>
+    <div class="pgrid" id="prod-grid"></div>
+  </div>
+  <div class="hfooter">
+    <span>© 2026 BLSF + Freedom Brands · bls.foundation@gmail.com</span>
+    <span>Ward 11, Seshego, Polokwane, Limpopo</span>
+    <span>Creator: Stanley Sivhabu — Mr South Africa 103</span>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div id="auth" class="page active">
+  <div class="stripe"></div>
+  <div class="awrap">
+    <div class="aleft">
+      <h2>Join BLSF +<em>Freedom Brands</em></h2>
+      <p>Become a volunteer, artisan, or manager in the BLSF communal crime prevention and economic development campaign for Ward 11, Seshego.</p>
+      <div class="pledge">"On my honour: I pledge that I am the nerve of my community and I shall perform my communal duties and protect to preserve my culture and my people without prejudice to any, so help me God."<cite>— BLSF Volunteer's Pledge</cite></div>
+    </div>
+    <div class="aright">
+      <button class="back-lnk" onclick="goTo('home')">← Return to Home</button>
+      <div class="atabs">
+        <button class="atab" id="tab-su" onclick="switchAuthTab('signup')">Sign Up</button>
+        <button class="atab on" id="tab-li" onclick="switchAuthTab('login')">Sign In</button>
+      </div>
+
+      <!-- SIGN UP -->
+      <div class="aform" id="form-signup">
+        <h3>Create Account</h3>
+        <div class="sub">Join the BLSF + Freedom Brands network</div>
+        <div class="fg"><label class="fl">Your Role</label>
+          <div class="rgrid">
+            <div class="ropt sel" onclick="selRole(this,'VOLUNTEER')"><span class="ri">🤝</span><span class="rl">Volunteer</span></div>
+            <div class="ropt" onclick="selRole(this,'ARTISAN')"><span class="ri">🎨</span><span class="rl">Artisan</span></div>
+            <div class="ropt" onclick="selRole(this,'MANAGER')"><span class="ri">📋</span><span class="rl">Manager</span></div>
+            <div class="ropt" onclick="selRole(this,'CEO')"><span class="ri">👑</span><span class="rl">CEO / Admin</span></div>
+          </div>
+        </div>
+        <div class="coderow" id="ceo-row"><label class="fl">CEO Code</label><input class="fi" type="password" id="su-ceocode" placeholder="Enter CEO code…"><div class="hint">Hint: BLSF-CEO-2026</div></div>
+        <div class="coderow" id="mgr-row"><label class="fl">Manager Code</label><input class="fi" type="password" id="su-mgrcode" placeholder="Enter manager code…"><div class="hint">Hint: WARD11-MGR</div></div>
+        <div class="fg"><label class="fl">Full Name</label><input class="fi" type="text" id="su-name" placeholder="Your full name"></div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="su-email" placeholder="your@email.com"></div>
+        <div class="fg"><label class="fl">Date of Birth</label><input class="fi" type="date" id="su-dob"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="su-pass" placeholder="Minimum 8 characters"></div>
+        <div class="fg"><label class="fl">Ward / Area</label>
+          <select class="fi" id="su-ward">
+            <option value="">Select your ward…</option>
+            <option value="ward11">Ward 11 — Seshego (Primary)</option>
+            <option value="other">Other Ward</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Preferred Language</label>
+          <select class="fi" id="su-lang">
+            <option value="en">English</option><option value="af">Afrikaans</option>
+            <option value="zu">isiZulu</option><option value="xh">isiXhosa</option>
+            <option value="st">Sesotho</option><option value="tn">Setswana</option>
+            <option value="nso">Sepedi</option><option value="ts">Xitsonga</option>
+            <option value="ve">Tshivenda</option><option value="nr">isiNdebele</option>
+            <option value="ss">siSwati</option><option value="sl">Sign Language</option>
+          </select>
+        </div>
+        <div class="agree">By signing up you agree to uphold the <strong style="color:var(--oc)">BLSF Volunteer Pledge</strong> and the values of the 1949 Programme of Action.</div>
+        <button class="btn btn-p" style="width:100%;justify-content:center;" onclick="doSignUp()">✦ Create Account</button>
+        <div style="text-align:center;margin-top:12px;font-size:12.5px;color:var(--mu);">Have an account? <button onclick="switchAuthTab('login')" style="background:none;border:none;color:var(--g);cursor:pointer;font-size:12.5px;font-weight:700;">Sign In</button></div>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="aform on" id="form-login">
+        <h3>Welcome Back</h3>
+        <div class="sub">Sign in to your Matriks account</div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="li-email" placeholder="your@email.com"></div>
+        <div class="fg"><label class="fl">Password</label><input class="fi" type="password" id="li-pass" placeholder="Your password"></div>
+        <button class="btn btn-p" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="doLogin()">Sign In →</button>
+        <div class="divider">or</div>
+        <button class="btn btn-g" style="width:100%;justify-content:center;font-size:13px;" onclick="demoLogin()">🚀 Demo — Full CEO Access (Stanley Sivhabu)</button>
+        <div class="dhint">
+          <strong style="color:var(--oc)">Demo accounts:</strong><br>
+          stanley@blsf.org → CEO<br>
+          mbulelo@blsf.org → Manager<br>
+          william@blsf.org → Volunteer<br>
+          <span style="color:var(--mu);font-size:8px;">(any password works)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div id="chat" class="page">
+  <aside class="csb">
+    <div class="csb-top">
+      <div class="csb-logo">
+        <div class="csb-ico">✦</div>
+        <div><div class="csb-nt">Ask Matriks AI</div><div class="csb-ns">BLSF + Freedom Brands</div></div>
+      </div>
+      <div class="csb-user">
+        <div class="udot"></div>
+        <div class="uname" id="chat-uname">Community Member</div>
+        <span class="badge b-VOLUNTEER" id="chat-role-badge" style="flex-shrink:0;font-size:7px;padding:1px 5px;">Guest</span>
+      </div>
+    </div>
+    <div class="csb-tabs">
+      <button class="ctab on" onclick="setSTab(this,'tab-chat')">💬</button>
+      <button class="ctab" onclick="setSTab(this,'tab-conn')">👥</button>
+      <button class="ctab" onclick="setSTab(this,'tab-basket')">🛒</button>
+      <button class="ctab" onclick="setSTab(this,'tab-num')">🔢</button>
+      <button class="ctab" onclick="setSTab(this,'tab-hist')">📜</button>
+      <button class="ctab" onclick="setSTab(this,'tab-kb')">📚</button>
+    </div>
+    <!-- CHAT TAB -->
+    <div class="stab on" id="tab-chat">
+      <div class="csec">
+        <div class="slbl">Response Mode</div>
+        <button class="smb on" onclick="setMode(this,'TEACHING')"><span class="sdot"></span>📖 Teaching</button>
+        <button class="smb" onclick="setMode(this,'MOTIVATING')"><span class="sdot"></span>🔥 Motivating</button>
+        <button class="smb" onclick="setMode(this,'COMMERCIAL')"><span class="sdot"></span>🛒 Commercial</button>
+        <button class="smb" onclick="setMode(this,'HISTORICAL')"><span class="sdot"></span>📜 Historical</button>
+        <button class="smb" onclick="setMode(this,'COMFORTING')"><span class="sdot"></span>🤗 Comforting</button>
+        <button class="smb" onclick="setMode(this,'NUMBERS')"><span class="sdot"></span>🔢 Numbers</button>
+        <button class="smb" onclick="setMode(this,'ARTISAN')"><span class="sdot"></span>🎨 Artisan</button>
+      </div>
+      <div class="sdiv"></div>
+      <div class="sqlinks">
+        <div class="slbl">Quick Links</div>
+        <button class="slnk" onclick="quickAsk('Show me all FHCB products with prices and artisan names')">🎨 FHCB Products</button>
+        <button class="slnk" onclick="quickAsk('Find hardware stores near Seshego Ward 11 Polokwane')">🔨 Hardware Stores</button>
+        <button class="slnk" onclick="quickAsk('Find farmers markets and food suppliers near Polokwane')">🌾 Farmers & Suppliers</button>
+        <button class="slnk" onclick="quickAsk('List logistics and delivery companies in Polokwane')">🚚 Logistics</button>
+        <button class="slnk" onclick="quickAsk('Explain the 1949 Programme of Action and SelfID framework')">📚 1949 Syllabus</button>
+        <button class="slnk" onclick="openPopupModal()">💌 Send Pop-Up Message</button>
+        <button class="slnk" onclick="quickAsk('Translate good morning welcome to all 11 South African languages')">🌍 Translate</button>
+        <button class="slnk" onclick="quickAsk('Help me calculate stock profit and expenses')">📦 Stock & Numbers</button>
+      </div>
+    </div>
+    <!-- CONNECTIONS TAB -->
+    <div class="stab" id="tab-conn">
+      <div class="conn-wrap">
+        <div class="slbl">My Linked People</div>
+        <div id="conn-list"></div>
+        <div class="sdiv"></div>
+        <button class="btn btn-p btn-sm" style="width:100%;justify-content:center;" onclick="openPopupModal()">💌 Send Pop-Up</button>
+        <div style="margin-top:10px;font-family:'Space Mono',monospace;font-size:8px;color:var(--mu);line-height:1.8;">
+          User→User: <strong style="color:var(--oc)" id="u2u-left">3</strong> left<br>
+          User→Artisan: <strong style="color:var(--grn)">Unlimited</strong>
+        </div>
+      </div>
+    </div>
+    <!-- BASKET TAB -->
+    <div class="stab" id="tab-basket">
+      <div class="basket-wrap">
+        <div class="btotal"><div class="btlbl">Total</div><div class="btamt" id="basket-total">R0</div></div>
+        <div id="basket-list"><div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:14px 0;">Basket empty.</div></div>
+        <button class="btn btn-p btn-sm" style="width:100%;justify-content:center;margin-top:8px;" onclick="checkoutBasket()">✦ Checkout</button>
+        <button class="btn btn-g btn-sm" style="width:100%;justify-content:center;margin-top:5px;" onclick="clearBasket()">Clear</button>
+      </div>
+    </div>
+    <!-- NUMBERS TAB -->
+    <div class="stab" id="tab-num">
+      <div class="num-wrap">
+        <div class="slbl">Calculator</div>
+        <div class="calc-display">
+          <div class="calc-expr" id="calc-expr"></div>
+          <div class="calc-result" id="calc-result">0</div>
+        </div>
+        <div class="calc-grid" id="calc-grid"></div>
+        <div class="sdiv"></div>
+        <button class="slnk" onclick="quickAsk('Calculate: I have 50 items sold at R200 each, expenses R3000, what is my profit?')">📦 Stock Profit</button>
+        <button class="slnk" onclick="quickAsk('Help me organise my bank statement transactions by date')">🏦 Bank Statement</button>
+      </div>
+    </div>
+    <!-- HISTORY TAB -->
+    <div class="stab" id="tab-hist">
+      <div class="hist-wrap">
+        <div class="slbl">Chat History</div>
+        <div id="hist-list"><div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:14px 0;">No history yet.</div></div>
+        <div class="sdiv"></div>
+        <div class="slbl">Favourites</div>
+        <div id="fav-list"><div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:8px 0;">None saved.</div></div>
+      </div>
+    </div>
+    <!-- KNOWLEDGE TAB -->
+    <div class="stab" id="tab-kb">
+      <div class="kb-wrap">
+        <div class="slbl">Upload Knowledge</div>
+        <div class="kbf" onclick="document.getElementById('kb-file-input').click()">
+          <div style="font-size:22px;margin-bottom:5px;">📎</div>
+          <div style="font-family:'Space Mono',monospace;font-size:8px;color:var(--mu);text-transform:uppercase;">Tap to upload</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:3px;font-style:italic;">PDF, TXT, JPG, PNG, MP3, MP4</div>
+        </div>
+        <input type="file" id="kb-file-input" style="display:none" multiple accept=".pdf,.txt,.jpg,.jpeg,.png,.mp3,.mp4,.wav" onchange="handleKBUpload(this)">
+        <div id="kb-files"></div>
+        <div class="sdiv"></div>
+        <div class="slbl">Add Note / Text</div>
+        <textarea class="fi" id="kb-text" rows="3" placeholder="Paste prices, contacts, info…" style="margin-bottom:8px;resize:vertical;font-size:12px;"></textarea>
+        <button class="btn btn-p btn-sm" style="width:100%;justify-content:center;" onclick="saveKBText()">+ Save</button>
+        <div class="sdiv"></div>
+        <div class="slbl">Saved (<span id="kb-count">0</span>)</div>
+        <div id="kb-entries-list"></div>
+      </div>
+    </div>
+    <div class="sfoot">
+      <div class="sfrow">
+        <button class="sfb" onclick="goTo('home')">⌂ Home</button>
+        <button class="sfb" onclick="openPopupModal()">💌 Pop-Up</button>
+        <button class="sfb" onclick="clearChat()">↺ Clear</button>
+        <button class="sfb" onclick="saveSession()">💾 Save</button>
+      </div>
+    </div>
+  </aside>
+  <div class="cmain">
+    <div class="chdr">
+      <div class="ctit">Ask <em>Matriks</em></div>
+      <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
+        <select class="lang-sel" id="lang-sel" onchange="curLang=this.value">
+          <option value="en">🇿🇦 English</option>
+          <option value="zu">isiZulu</option><option value="xh">isiXhosa</option>
+          <option value="af">Afrikaans</option><option value="st">Sesotho</option>
+          <option value="tn">Setswana</option><option value="nso">Sepedi</option>
+          <option value="ts">Xitsonga</option><option value="ve">Tshivenda</option>
+          <option value="nr">Ndebele</option><option value="ss">siSwati</option>
+        </select>
+        <button class="vc-btn vc-mic" id="hd-mic" onclick="toggleVoiceInput()">🎤</button>
+        <button class="vc-btn vc-spk" id="hd-spk" onclick="toggleVoiceOutput()">🔊</button>
+        <span class="cpill pw">Ward 11</span>
+        <span class="cpill pl"><span class="blink"></span>Live</span>
+      </div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="cinput">
+      <div class="cinwrap">
+        <textarea id="chat-input" rows="1" placeholder="Just Ask — Matriks will do it for you…" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <div class="cin-btns">
+          <button class="ic-btn ic-att" onclick="document.getElementById('chat-att').click()">📎</button>
+          <input type="file" id="chat-att" style="display:none" accept="image/*,.pdf,.txt" onchange="handleChatAttach(this)">
+          <button class="ic-btn ic-mic" id="mic-btn" onclick="toggleVoiceInput()">🎤</button>
+          <button class="ic-btn ic-send" id="send-btn" onclick="sendMsg()" disabled>➤</button>
+        </div>
+      </div>
+      <div class="chint">
+        <span>Enter to send · Shift+Enter new line</span>
+        <span id="voice-status" style="color:var(--tc);">🔊 Voice ON</span>
+        <span id="msg-limit-info" style="color:var(--oc);"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+var AUTH_CODES = {CEO:'BLSF-CEO-2026', MANAGER:'WARD11-MGR'};
+
+var PRODUCTS = [
+  {id:'p1',name:'My-Holder Mini Max',creator:'Xhalisile Ishmael Mayo',price:100},
+  {id:'p2',name:'My-Holder Mini',creator:'Mbulelo Gladman Mayo',price:200},
+  {id:'p3',name:'Table Stacks',creator:'Palesa Nqula',price:120},
+  {id:'p4',name:'Photo Frame Collage',creator:'Nomonde Albertina Sivhabu',price:350},
+  {id:'p5',name:'Mirror Africa',creator:'Khethiwe Constance Mangwwe',price:180},
+  {id:'p6',name:'Royal Shweshwe Tapestry',creator:'Luxury Line',price:1450},
+  {id:'p7',name:'Hand-Carved Ebony Big Five',creator:'Luxury Line',price:2800},
+  {id:'p8',name:'Ndebele Heritage Neckpiece',creator:'Luxury Line',price:850}
+];
+
+var MEMBERS = [
+  {id:1,name:'Stanley Sivhabu',alias:'Mr SA 103',role:'CEO',email:'stanley@blsf.org',dob:'1973-01-15',status:'Active',ref:'FHCB-2026-CEO-001'},
+  {id:2,name:'Mbulelo Gladman Mayo',role:'MANAGER',email:'mbulelo@blsf.org',dob:'1985-06-20',status:'Active',ref:'FHCB-2026-MANAGER-001'},
+  {id:3,name:'William Makoro',role:'VOLUNTEER',email:'william@blsf.org',dob:'1990-03-10',status:'Active',ref:'FHCB-2026-VOLUNTEER-001'},
+  {id:4,name:'Xhalisile Ishmael Mayo',role:'ARTISAN',email:'xhalisile@blsf.org',dob:'1992-11-05',status:'Active',ref:'FHCB-2026-ARTISAN-001'},
+  {id:5,name:'Nomonde Albertina Sivhabu',role:'ARTISAN',email:'nomonde@blsf.org',dob:'1988-07-22',status:'Active',ref:'FHCB-2026-ARTISAN-002'}
+];
+
+var DEMO_CONNECTIONS = [
+  {memberId:2, relation:'Colleague', unlimited:false},
+  {memberId:3, relation:'Friend',    unlimited:false},
+  {memberId:4, relation:'Artisan',   unlimited:true},
+  {memberId:5, relation:'Artisan',   unlimited:true}
+];
+
+var STICKERS = ['🌟','💛','🤝','🙏','🔥','💪','🌹','🏆','🎉','✨','🌍','💚','🎨','🦁','🌺','🎶','💫','🙌','❤️','🫶','🏅','🕊️','🌈','🎊'];
+
+// ── State ─────────────────────────────────────────────────────────
+var curUser = null;
+var curMode = 'TEACHING';
+var curLang = 'en';
+var voiceOutputOn = true;
+var isRecording = false;
+var isLoading = false;
+var recognition = null;
+var selRoleVal = 'VOLUNTEER';
+var curMsgType = 'greeting';
+var curRating = 0;
+var curSticker = '';
+var basket = [];
+var kbEntries = [];
+var historyLog = [];
+var savedFavs = [];
+var popupCounts = {};
+var chatHistory = [];
+var calcExpr = '';
+
+// ── Storage ───────────────────────────────────────────────────────
+function lsKey(k) { return (curUser ? 'mx_'+curUser.email : 'mx_guest') + '_' + k; }
+function lsSave(k,v) { try { localStorage.setItem(lsKey(k), JSON.stringify(v)); } catch(e){} }
+function lsLoad(k,def) { try { var v = localStorage.getItem(lsKey(k)); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
+function loadUserData() {
+  basket = lsLoad('basket', []);
+  kbEntries = lsLoad('kb', []);
+  historyLog = lsLoad('hist', []);
+  savedFavs = lsLoad('favs', []);
+  popupCounts = lsLoad('pcounts', {});
+  renderBasket(); renderKB(); renderHistory(); renderConnections(); updateMsgInfo();
+}
+function saveAll() { lsSave('basket',basket); lsSave('kb',kbEntries); lsSave('hist',historyLog); lsSave('favs',savedFavs); lsSave('pcounts',popupCounts); }
+
+// ── Init ──────────────────────────────────────────────────────────
+(function init() {
+  // Build product grid on home page
+  var pg = document.getElementById('prod-grid');
+  if (pg) {
+    pg.innerHTML = PRODUCTS.map(function(p) {
+      return '<div class="pcard'+(p.price>500?' lux':'')+'"><div class="pn">'+p.name+'</div><div class="pc2">'+p.creator+'</div><div class="pp">R'+p.price.toLocaleString()+'</div></div>';
+    }).join('');
+  }
+  buildCalc();
+  buildStickerPicker();
+  document.getElementById('chat-input').addEventListener('input', function() {
+    document.getElementById('send-btn').disabled = !this.value.trim();
+  });
+  if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = function(){ window.speechSynthesis.getVoices(); };
+})();
+
+// ── Navigation ────────────────────────────────────────────────────
+function goTo(page, tab) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById(page).classList.add('active');
+  if (page === 'auth' && tab) switchAuthTab(tab);
+  if (page === 'chat') initChat();
+  window.scrollTo(0,0);
+}
+
+function switchAuthTab(tab) {
+  document.getElementById('tab-su').classList.toggle('on', tab === 'signup');
+  document.getElementById('tab-li').classList.toggle('on', tab === 'login');
+  document.getElementById('form-signup').classList.toggle('on', tab === 'signup');
+  document.getElementById('form-login').classList.toggle('on', tab === 'login');
+}
+
+function setSTab(btn, id) {
+  document.querySelectorAll('.ctab').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById(id).classList.add('on');
+}
+
+// ── Auth ──────────────────────────────────────────────────────────
+function selRole(el, role) {
+  document.querySelectorAll('.ropt').forEach(function(r){ r.classList.remove('sel'); });
+  el.classList.add('sel');
+  selRoleVal = role;
+  document.getElementById('ceo-row').style.display = role === 'CEO' ? 'block' : 'none';
+  document.getElementById('mgr-row').style.display = role === 'MANAGER' ? 'block' : 'none';
+}
+
+function doSignUp() {
+  var name = document.getElementById('su-name').value.trim();
+  var email = document.getElementById('su-email').value.trim();
+  var pass = document.getElementById('su-pass').value;
+  var ward = document.getElementById('su-ward').value;
+  var dob = document.getElementById('su-dob').value;
+  var lang = document.getElementById('su-lang').value;
+  if (!name || !email || !pass || !ward) { showToast('Please fill all required fields','e'); return; }
+  if (pass.length < 8) { showToast('Password min 8 characters','e'); return; }
+  if (selRoleVal === 'CEO' && document.getElementById('su-ceocode').value !== AUTH_CODES.CEO) { showToast('Invalid CEO code','e'); return; }
+  if (selRoleVal === 'MANAGER' && document.getElementById('su-mgrcode').value !== AUTH_CODES.MANAGER) { showToast('Invalid Manager code','e'); return; }
+  curUser = {name:name, email:email, role:selRoleVal, dob:dob, lang:lang, ref:'FHCB-2026-'+selRoleVal+'-NEW', status:'Active'};
+  curLang = lang;
+  loadUserData();
+  showToast('Welcome, '+name+'! Account created.','s');
+  setTimeout(function(){ updateChatUser(); goTo('chat'); }, 500);
+}
+
+function doLogin() {
+  var email = document.getElementById('li-email').value.trim();
+  var pass = document.getElementById('li-pass').value;
+  if (!email || !pass) { showToast('Enter email and password','e'); return; }
+  var found = null;
+  for (var i = 0; i < MEMBERS.length; i++) {
+    if (MEMBERS[i].email.toLowerCase() === email.toLowerCase()) { found = MEMBERS[i]; break; }
+  }
+  if (found) {
+    curUser = JSON.parse(JSON.stringify(found));
+    loadUserData();
+    showToast('Welcome back, '+found.name+'!','s');
+    setTimeout(function(){ updateChatUser(); goTo('chat'); }, 500);
+  } else {
+    showToast('Account not found. Please sign up.','e');
+  }
+}
+
+function demoLogin() {
+  curUser = JSON.parse(JSON.stringify(MEMBERS[0]));
+  loadUserData();
+  showToast('Welcome, Stanley! CEO access active.','s');
+  setTimeout(function(){ updateChatUser(); goTo('chat'); }, 400);
+}
+
+function updateChatUser() {
+  if (!curUser) return;
+  document.getElementById('chat-uname').textContent = curUser.name;
+  var rb = document.getElementById('chat-role-badge');
+  rb.className = 'badge b-'+curUser.role;
+  rb.textContent = curUser.role;
+}
+
+// ── Chat init ─────────────────────────────────────────────────────
+function initChat() {
+  updateChatUser();
+  checkBirthdays();
+  chatHistory = [];
+  var msgsEl = document.getElementById('msgs');
+  msgsEl.innerHTML = '';
+  var firstName = curUser ? curUser.name.split(' ')[0] : 'Friend';
+  var recapHtml = '';
+  if (historyLog.length > 0) {
+    var last = historyLog.slice(-3).map(function(h){ return '"'+h.q.substring(0,40)+'…"'; }).join(', ');
+    recapHtml = '<div class="recap"><strong>✦ Welcome back, '+firstName+'!</strong><br>Recent: '+last+'</div>';
+  }
+  msgsEl.innerHTML = '<div class="wb">' +
+    '<div class="wb-ey">Bulelani Foundation + Freedom Brands · 2026</div>' +
+    '<div class="wb-t">I am Matriks ✦</div>' +
+    '<div class="wb-s">"I am you in me and you are me in you."</div>' +
+    recapHtml +
+    '<div class="qgrid">' +
+      '<button class="qbtn" onclick="quickAsk(\'Tell me about BLSF and Freedom Brands\')"><span class="qico">🏘️</span>BLSF Mission</button>' +
+      '<button class="qbtn" onclick="quickAsk(\'Show all FHCB products with prices\')"><span class="qico">🎨</span>FHCB Products</button>' +
+      '<button class="qbtn" onclick="quickAsk(\'Find hardware stores near Seshego Polokwane\')"><span class="qico">🔨</span>Hardware</button>' +
+      '<button class="qbtn" onclick="openPopupModal()"><span class="qico">💌</span>Pop-Up Msg</button>' +
+      '<button class="qbtn" onclick="quickAsk(\'Explain SelfID MeIDmE MeIDThem MeINthem\')"><span class="qico">✨</span>SelfID</button>' +
+      '<button class="qbtn" onclick="quickAsk(\'Translate good morning into all South African languages\')"><span class="qico">🌍</span>Translate</button>' +
+    '</div></div>';
+  var greeting = 'Hi '+firstName+', welcome to Ask Matriks AI for Bulelani Foundation and Freedom Brands. I can give answers to both these organisations. Just Ask!';
+  setTimeout(function(){ addMsg('assistant', greeting, curMode); if(voiceOutputOn) speak(greeting); }, 400);
+}
+
+// ── Birthday check ────────────────────────────────────────────────
+function checkBirthdays() {
+  if (!curUser) return;
+  var today = new Date();
+  var todayMD = String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  DEMO_CONNECTIONS.forEach(function(conn) {
+    var m = MEMBERS.find(function(x){ return x.id === conn.memberId; });
+    if (m && m.dob && m.dob.substring(5) === todayMD) {
+      setTimeout(function(){
+        showPopupNotif('🎂 Today is '+m.name+"'s birthday! Would you like to send a birthday pop-up message?");
+      }, 2500);
+    }
+  });
+}
+
+// ── Pop-Up Messaging ──────────────────────────────────────────────
+function openPopupModal() {
+  if (!curUser) { showToast('Please sign in first','e'); return; }
+  var sel = document.getElementById('popup-recipient');
+  sel.innerHTML = '<option value="">Choose linked person…</option>';
+  DEMO_CONNECTIONS.forEach(function(conn) {
+    var m = MEMBERS.find(function(x){ return x.id === conn.memberId; });
+    if (!m) return;
+    var cnt = popupCounts[m.id] || 0;
+    var left = conn.unlimited ? '∞' : Math.max(0, 3-cnt) + ' left';
+    sel.innerHTML += '<option value="'+m.id+'" data-unlimited="'+conn.unlimited+'">'+m.name+' — '+conn.relation+' ('+left+')</option>';
+  });
+  document.getElementById('popup-warn').style.display = 'none';
+  document.getElementById('popup-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('popup-modal').classList.remove('open');
+}
+
+function checkPopupLimit() {
+  var sel = document.getElementById('popup-recipient');
+  var opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) return;
+  var id = parseInt(opt.value);
+  var unlimited = opt.dataset.unlimited === 'true';
+  var cnt = popupCounts[id] || 0;
+  var warn = document.getElementById('popup-warn');
+  if (!unlimited) {
+    var left = Math.max(0, 3-cnt);
+    warn.textContent = left <= 0 ? '⚠ Message limit reached (max 3).' : 'ℹ '+left+' message(s) remaining with this person.';
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
+}
+
+function selMsgType(btn, type) {
+  curMsgType = type;
+  document.querySelectorAll('#popup-modal .rel-btn').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  document.getElementById('popup-rating-row').style.display = type === 'rating' ? 'block' : 'none';
+  document.getElementById('popup-sticker-row').style.display = type === 'sticker' ? 'block' : 'none';
+  var txt = document.getElementById('popup-text');
+  if (type === 'birthday') txt.value = '🎂 Wishing you a beautiful birthday filled with joy and blessings!';
+  else if (type === 'thanks') txt.value = '🙏 Thank you so much for your wonderful service to our community!';
+  else if (type === 'greeting') txt.value = '👋 Warm greetings from a fellow community member!';
+  else if (type === 'sticker') txt.value = '';
+}
+
+function setRating(n) {
+  curRating = n;
+  document.querySelectorAll('.star').forEach(function(s,i){ s.classList.toggle('on', i < n); });
+  document.getElementById('rating-val').textContent = '★'.repeat(n) + '☆'.repeat(5-n) + ' — ' + ['','Poor','Fair','Good','Great','Excellent'][n];
+}
+
+function buildStickerPicker() {
+  var el = document.getElementById('sticker-picker');
+  if (!el) return;
+  el.innerHTML = STICKERS.map(function(s){
+    return '<div class="sticker" onclick="pickSticker(this,\''+s+'\')">'+s+'</div>';
+  }).join('');
+}
+
+function pickSticker(el, s) {
+  document.querySelectorAll('.sticker').forEach(function(x){ x.classList.remove('sel'); });
+  el.classList.add('sel');
+  curSticker = s;
+  document.getElementById('popup-text').value = s + ' With appreciation from a community member!';
+}
+
+function sendPopupMsg() {
+  var sel = document.getElementById('popup-recipient');
+  var opt = sel.options[sel.selectedIndex];
+  var txt = document.getElementById('popup-text').value.trim();
+  if (!opt || !opt.value) { showToast('Select a recipient','e'); return; }
+  if (!txt) { showToast('Enter a message','e'); return; }
+  var id = parseInt(opt.value);
+  var unlimited = opt.dataset.unlimited === 'true';
+  var cnt = popupCounts[id] || 0;
+  if (!unlimited && cnt >= 3) { showToast('Message limit reached for this person','e'); return; }
+  var m = MEMBERS.find(function(x){ return x.id === id; });
+  popupCounts[id] = cnt + 1;
+  saveAll();
+  closeModal();
+  showPopupNotif('✉ Message sent to '+m.name+': "'+txt.substring(0,80)+'"');
+  if (curMsgType === 'rating' && curRating > 0) {
+    var stars = '⭐'.repeat(curRating);
+    var rMsg = '📊 Rating Result — '+m.name+' received '+curRating+'/5 stars ('+stars+') from '+curUser.name+'. '+(curRating >= 4 ? 'Excellent work! Keep it up. 🏆' : 'Thank you for the feedback.');
+    setTimeout(function(){ showPopupNotif(rMsg); }, 900);
+  }
+  updateMsgInfo();
+  showToast('Pop-Up sent to '+m.name+' ✓','s');
+  speak('Pop-up message sent to '+m.name+'. Just Ask, it will be done for you.');
+}
+
+function showPopupNotif(msg) {
+  var el = document.createElement('div');
+  el.className = 'popup-notif';
+  el.innerHTML = '<div class="popup-from">✦ Ask Matriks Pop-Up</div><div class="popup-body">'+msg+'</div><button class="popup-close-btn" onclick="this.parentElement.remove()">Dismiss ✕</button>';
+  document.body.appendChild(el);
+  if (voiceOutputOn) speak(msg.substring(0,200));
+  setTimeout(function(){ if(el.parentElement) el.remove(); }, 9000);
+}
+
+function updateMsgInfo() {
+  var total = 0;
+  DEMO_CONNECTIONS.forEach(function(c){
+    if (!c.unlimited) { var cnt = popupCounts[c.memberId] || 0; total += Math.max(0, 3-cnt); }
+  });
+  var el = document.getElementById('u2u-left');
+  if (el) el.textContent = total;
+  var info = document.getElementById('msg-limit-info');
+  if (info) info.textContent = '💌 '+total+' user msg(s) left';
+}
+
+// ── Connections ────────────────────────────────────────────────────
+function renderConnections() {
+  var el = document.getElementById('conn-list');
+  if (!el) return;
+  el.innerHTML = DEMO_CONNECTIONS.map(function(conn) {
+    var m = MEMBERS.find(function(x){ return x.id === conn.memberId; });
+    if (!m) return '';
+    var cnt = popupCounts[m.id] || 0;
+    var left = conn.unlimited ? '∞' : Math.max(0,3-cnt)+' left';
+    return '<div class="conn-card">' +
+      '<div class="conn-av">'+m.name[0]+'</div>' +
+      '<div style="flex:1;min-width:0;"><div class="conn-name">'+m.name+'</div>' +
+      '<div class="conn-rel">'+conn.relation+' · <span class="badge b-'+m.role+'" style="font-size:6px;padding:1px 4px;">'+m.role+'</span></div></div>' +
+      '<button class="conn-msg-btn" onclick="openPopupModalFor('+m.id+')">💌 '+left+'</button>' +
+    '</div>';
+  }).join('');
+}
+
+function openPopupModalFor(id) {
+  openPopupModal();
+  setTimeout(function(){
+    document.getElementById('popup-recipient').value = id;
+    checkPopupLimit();
+  }, 100);
+}
+
+// ── Calculator ────────────────────────────────────────────────────
+function buildCalc() {
+  var buttons = ['7','8','9','÷','4','5','6','×','1','2','3','−','0','.','=','+','C','±','%','⌫'];
+  var el = document.getElementById('calc-grid');
+  if (!el) return;
+  el.innerHTML = buttons.map(function(b) {
+    var cls = 'calc-btn';
+    if ('÷×−+'.indexOf(b) >= 0) cls += ' op';
+    if (b === '=') cls += ' eq';
+    if (b === 'C') cls += ' clr';
+    return '<button class="'+cls+'" onclick="calcPress(\''+b+'\')">'+b+'</button>';
+  }).join('');
+}
+
+function calcPress(k) {
+  var expr = document.getElementById('calc-expr');
+  var res = document.getElementById('calc-result');
+  if (k === 'C') { calcExpr = ''; expr.textContent = ''; res.textContent = '0'; }
+  else if (k === '⌫') { calcExpr = calcExpr.slice(0,-1); res.textContent = calcExpr || '0'; }
+  else if (k === '=') {
+    try {
+      var e = calcExpr.replace(/÷/g,'/').replace(/×/g,'*').replace(/−/g,'-');
+      var r = Function('"use strict";return ('+e+')')();
+      expr.textContent = calcExpr + '=';
+      res.textContent = isNaN(r) ? 'Error' : Number.isInteger(r) ? r.toLocaleString('en-ZA') : parseFloat(r.toFixed(4)).toLocaleString('en-ZA');
+      calcExpr = String(r);
+    } catch(e) { res.textContent = 'Error'; }
+  } else if (k === '±') {
+    try { var r2 = -parseFloat(calcExpr); calcExpr = String(r2); res.textContent = r2.toLocaleString('en-ZA'); } catch(e){}
+  } else if (k === '%') {
+    try { var r3 = parseFloat(calcExpr)/100; calcExpr = String(r3); res.textContent = r3.toLocaleString('en-ZA'); } catch(e){}
+  } else { calcExpr += k; res.textContent = calcExpr; }
+}
+
+// ── Voice ─────────────────────────────────────────────────────────
+function toggleVoiceOutput() {
+  voiceOutputOn = !voiceOutputOn;
+  document.getElementById('hd-spk').classList.toggle('muted', !voiceOutputOn);
+  document.getElementById('voice-status').textContent = voiceOutputOn ? '🔊 Voice ON' : '🔇 Voice OFF';
+  if (voiceOutputOn) speak('Voice reply is now on.');
+}
+
+function speak(text) {
+  if (!voiceOutputOn || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text.replace(/[#*`<>]/g,'').substring(0,600));
+  u.lang = 'en-ZA'; u.rate = 0.9;
+  var voices = window.speechSynthesis.getVoices();
+  var sa = voices.find(function(v){ return v.lang.startsWith('en-ZA'); });
+  if (sa) u.voice = sa;
+  window.speechSynthesis.speak(u);
+}
+
+function toggleVoiceInput() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Voice input not supported in this browser','e'); return; }
+  if (isRecording) { if (recognition) recognition.stop(); return; }
+  recognition = new SR();
+  recognition.lang = 'en-ZA';
+  recognition.interimResults = true;
+  recognition.onstart = function() {
+    isRecording = true;
+    document.getElementById('mic-btn').classList.add('rec');
+    document.getElementById('hd-mic').classList.add('active');
+    showToast('🎤 Listening…','s');
+  };
+  recognition.onresult = function(e) {
+    var t = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript;
+    var inp = document.getElementById('chat-input');
+    inp.value = t;
+    autoResize(inp);
+    document.getElementById('send-btn').disabled = !t.trim();
+  };
+  recognition.onend = function() {
+    isRecording = false;
+    document.getElementById('mic-btn').classList.remove('rec');
+    document.getElementById('hd-mic').classList.remove('active');
+    if (document.getElementById('chat-input').value.trim()) sendMsg();
+  };
+  recognition.onerror = function() {
+    isRecording = false;
+    document.getElementById('mic-btn').classList.remove('rec');
+    document.getElementById('hd-mic').classList.remove('active');
+    showToast('Voice error. Try again.','e');
+  };
+  recognition.start();
+}
+
+// ── Basket ────────────────────────────────────────────────────────
+function basketTotal() { return basket.reduce(function(s,i){ return s+i.price; }, 0); }
+
+function addToBasket(prod) {
+  basket.push(prod); saveAll(); renderBasket();
+  showToast('✓ '+prod.name+' added','s');
+}
+
+function removeFromBasket(i) { basket.splice(i,1); saveAll(); renderBasket(); }
+function clearBasket() { basket = []; saveAll(); renderBasket(); }
+
+function checkoutBasket() {
+  if (!basket.length) { showToast('Basket is empty','e'); return; }
+  speak('Your basket has '+basket.length+' items totalling R'+basketTotal()+'. Processing checkout.');
+  showToast('Checkout — R'+basketTotal(),'s');
+}
+
+function renderBasket() {
+  document.getElementById('basket-total').textContent = 'R'+basketTotal().toLocaleString();
+  var el = document.getElementById('basket-list');
+  if (!basket.length) { el.innerHTML = '<div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:14px 0;">Basket empty.</div>'; return; }
+  el.innerHTML = basket.map(function(b,i){
+    return '<div class="bitem"><div style="font-size:16px;">🎨</div><div class="binfo"><div class="bname">'+b.name+'</div><div class="bprice">R'+b.price.toLocaleString()+'</div></div><button class="brm" onclick="removeFromBasket('+i+')">✕</button></div>';
+  }).join('');
+}
+
+// ── History ───────────────────────────────────────────────────────
+function addHistory(q, a) {
+  historyLog.push({q:q, a:a.substring(0,120), ts:new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'}), date:new Date().toLocaleDateString('en-ZA')});
+  if (historyLog.length > 100) historyLog.shift();
+  saveAll(); renderHistory();
+}
+
+function renderHistory() {
+  var el = document.getElementById('hist-list');
+  if (!el) return;
+  if (!historyLog.length) { el.innerHTML = '<div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:14px 0;">No history yet.</div>'; renderFavs(); return; }
+  el.innerHTML = historyLog.slice().reverse().slice(0,20).map(function(h){
+    return '<div class="hitem" onclick="quickAsk(\''+h.q.replace(/'/g,"\\'")+'\')"><div class="hq">'+h.q+'</div><div class="ht2">'+h.ts+' · tap to replay</div></div>';
+  }).join('');
+  renderFavs();
+}
+
+function addToFavs(q) {
+  if (savedFavs.indexOf(q) < 0) { savedFavs.push(q); saveAll(); renderFavs(); showToast('Saved ⭐','s'); }
+}
+
+function renderFavs() {
+  var el = document.getElementById('fav-list');
+  if (!el) return;
+  if (!savedFavs.length) { el.innerHTML = '<div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:8px 0;">None saved.</div>'; return; }
+  el.innerHTML = savedFavs.slice().reverse().slice(0,10).map(function(f){
+    return '<div class="hitem" onclick="quickAsk(\''+f.replace(/'/g,"\\'")+'\')"><div class="hq">⭐ '+f+'</div></div>';
+  }).join('');
+}
+
+// ── Knowledge Base ────────────────────────────────────────────────
+function handleKBUpload(inp) {
+  Array.from(inp.files).forEach(function(f){
+    if (f.type.startsWith('text/') || f.name.endsWith('.txt')) {
+      var r = new FileReader();
+      r.onload = function(e){ kbEntries.push({type:'text',name:f.name,content:e.target.result.substring(0,3000),date:new Date().toLocaleDateString()}); saveAll(); renderKB(); };
+      r.readAsText(f);
+    } else {
+      kbEntries.push({type:'file',name:f.name,content:'[Uploaded: '+f.name+']',date:new Date().toLocaleDateString()});
+      saveAll(); renderKB();
+    }
+  });
+  inp.value = '';
+  showToast('Added to Knowledge Base','s');
+}
+
+function saveKBText() {
+  var t = document.getElementById('kb-text').value.trim();
+  if (!t) { showToast('Enter some text first','e'); return; }
+  kbEntries.push({type:'note',name:'Note '+new Date().toLocaleDateString(),content:t,date:new Date().toLocaleDateString()});
+  document.getElementById('kb-text').value = '';
+  saveAll(); renderKB();
+  showToast('Knowledge saved ✓','s');
+}
+
+function removeKBEntry(i) { kbEntries.splice(i,1); saveAll(); renderKB(); }
+
+function renderKB() {
+  document.getElementById('kb-count').textContent = kbEntries.length;
+  var el = document.getElementById('kb-entries-list');
+  if (!el) return;
+  if (!kbEntries.length) { el.innerHTML = '<div style="text-align:center;font-size:12px;color:var(--mu);font-style:italic;padding:10px 0;">No entries yet.</div>'; return; }
+  var icons = {image:'🖼️',text:'📄',file:'📎',note:'📝',video:'🎬',audio:'🎵'};
+  el.innerHTML = kbEntries.map(function(e,i){
+    return '<div class="kbfile"><span style="font-size:14px;flex-shrink:0;">'+(icons[e.type]||'📎')+'</span><span class="kbfile-name">'+e.name+'</span><button class="kbfile-rm" onclick="removeKBEntry('+i+')">✕</button></div>';
+  }).join('');
+}
+
+// ── Mode ──────────────────────────────────────────────────────────
+function setMode(btn, mode) {
+  curMode = mode;
+  document.querySelectorAll('.smb').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+}
+
+// ── Message rendering ─────────────────────────────────────────────
+function fmt(t) {
+  return t.replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--g)">$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em style="color:#fde98a">$1</em>')
+    .replace(/`(.*?)`/g,'<code style="font-family:monospace;font-size:11px;background:rgba(212,160,23,.08);padding:1px 4px;border-radius:3px;color:var(--oc)">$1</code>')
+    .replace(/\n/g,'<br>');
+}
+
+function getTime() { return new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'}); }
+
+function addMsg(role, text, mode) {
+  var msgsEl = document.getElementById('msgs');
+  var t = getTime();
+  var av = curUser ? curUser.name[0].toUpperCase() : 'G';
+  var safeText = text.replace(/'/g, "\\'").replace(/\n/g,' ').substring(0,400);
+  var safeFav = text.substring(0,80).replace(/'/g,"\\'");
+  if (role === 'error') {
+    msgsEl.innerHTML += '<div class="mrow"><div class="mav a">✦</div><div class="mbub"><div class="mbub-inner err">⚠ '+text+'</div></div></div>';
+  } else if (role === 'user') {
+    msgsEl.innerHTML += '<div class="mrow u"><div class="mav u">'+av+'</div><div class="mbub"><div class="mbub-inner u">'+text.replace(/</g,'&lt;').replace(/\n/g,'<br>')+'</div><div class="mtime u"><span>'+t+'</span></div></div></div>';
+  } else {
+    msgsEl.innerHTML += '<div class="mrow"><div class="mav a">✦</div><div class="mbub"><div class="mbub-inner a">'+fmt(text)+'</div>' +
+      '<div class="mtime"><span>'+t+'</span><span class="mmode">'+(mode||'')+'</span>' +
+      '<button class="play-btn" onclick="speak(\''+safeText+'\')">▶ Play</button>' +
+      '<button class="play-btn" style="color:var(--grn);" onclick="addToFavs(\''+safeFav+'\')">⭐</button>' +
+      '<button class="play-btn" style="color:var(--tc);" onclick="openPopupModal()">💌</button>' +
+      '</div></div></div>';
+  }
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+function showTyping() {
+  var m = document.getElementById('msgs');
+  m.innerHTML += '<div class="typing" id="typ"><div class="mav a">✦</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  m.scrollTop = m.scrollHeight;
+}
+
+function hideTyping() { var t = document.getElementById('typ'); if(t) t.remove(); }
+
+// ── Input ─────────────────────────────────────────────────────────
+function quickAsk(q) {
+  var inp = document.getElementById('chat-input');
+  inp.value = q; autoResize(inp);
+  document.getElementById('send-btn').disabled = false;
+  sendMsg();
+}
+
+function autoResize(ta) { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight,100)+'px'; }
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); if(!document.getElementById('send-btn').disabled) sendMsg(); } }
+function clearChat() { chatHistory = []; initChat(); }
+function saveSession() { saveAll(); showToast('Session saved ✓','s'); }
+function handleChatAttach(inp) { if(inp.files[0]) showToast('📎 Attached: '+inp.files[0].name,'s'); inp.value=''; }
+
+// ── Send message ──────────────────────────────────────────────────
+function sendMsg() {
+  if (isLoading) return;
+  var inp = document.getElementById('chat-input');
+  var text = inp.value.trim();
+  if (!text) return;
+  inp.value = ''; inp.style.height = 'auto';
+  document.getElementById('send-btn').disabled = true;
+  var wb = document.querySelector('.wb');
+  if (wb) wb.remove();
+  addMsg('user', text);
+  chatHistory.push({role:'user', content:text});
+  isLoading = true; showTyping();
+  var kbCtx = kbEntries.length ? '\n\nUSER KNOWLEDGE BASE:\n'+kbEntries.map(function(e){ return e.content; }).join('\n---\n').substring(0,1500) : '';
+  var basketCtx = basket.length ? '\n\nUSER BASKET: '+basket.map(function(b){ return b.name+' R'+b.price; }).join(', ') : '';
+  var userCtx = curUser ? '\n\nCURRENT USER: '+curUser.name+' | Role: '+curUser.role+' | Lang: '+curLang : '';
+  var histCtx = historyLog.length ? '\n\nRECENT HISTORY: '+historyLog.slice(-5).map(function(h){ return 'Q: '+h.q; }).join(' | ') : '';
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: buildSystemPrompt() + userCtx + kbCtx + basketCtx + histCtx,
+      messages: chatHistory,
+      tools: [{type:'web_search_20250305', name:'web_search'}]
+    })
+  }).then(function(res){ return res.json(); }).then(function(d) {
+    var reply = '';
+    if (d.content) { d.content.forEach(function(c){ if(c.type==='text') reply += c.text; }); }
+    if (!reply) reply = 'Just Ask — it will be done for you.';
+    chatHistory.push({role:'assistant', content:reply});
+    hideTyping(); addMsg('assistant', reply, curMode);
+    addHistory(text, reply);
+    // Product chips
+    var matched = PRODUCTS.filter(function(p){ return reply.toLowerCase().indexOf(p.name.toLowerCase()) >= 0; });
+    if (matched.length) {
+      var chips = matched.map(function(p){
+        return '<div class="prod-chip" onclick="addToBasket({id:\''+p.id+'\',name:\''+p.name+'\',price:'+p.price+'})"><div class="pc-name">'+p.name+'</div><div class="pc-price">R'+p.price.toLocaleString()+'</div><div class="pc-add">+ Add to basket</div></div>';
+      }).join('');
+      document.getElementById('msgs').innerHTML += '<div class="prod-row">'+chips+'</div>';
+      document.getElementById('msgs').scrollTop = document.getElementById('msgs').scrollHeight;
+    }
+    if (voiceOutputOn) speak(reply.replace(/<[^>]+>/g,'').substring(0,500));
+    isLoading = false;
+  }).catch(function() {
+    hideTyping(); addMsg('error', 'Connection error. Please check your internet and try again.');
+    isLoading = false;
+  });
+}
+
+// ── System Prompt ─────────────────────────────────────────────────
+function buildSystemPrompt() {
+  return 'You are Ask Matriks AI — the community intelligence of Bulelani Living Stone Foundation (BLSF) and Freedom Brands (FHCB). Creator: Stanley Sivhabu aka Mr South Africa 103.\n\n' +
+  'GREETING: Always open with: "Hi [Name], welcome to Ask Matriks AI for Bulelani Foundation and Freedom Brands. I can give answers to both these organisations."\n' +
+  'CLOSING: Always end every reply with: "Just Ask — it will be done for you."\n\n' +
+  'PHILOSOPHY: "I am you in me and you are me in you." MeIDmE (self), MeIDThem (others view you), MeINthem (your presence in others). Theme: God\'s Kingdom — A Crowded Room.\n\n' +
+  'ORGANIZATIONS:\n- BLSF: Community development, crime prevention, Ward 11 Seshego Polokwane. Email: bls.foundation@gmail.com\n- Freedom Brands FHCB: Handcrafted artisan products. Artisans earn 90%. Campaign: 4000 houses, R800K, 12 weeks.\n\n' +
+  'PRODUCTS & ARTISANS:\n- Xhalisile Ishmael Mayo: My-Holder Mini Max R100\n- Mbulelo Gladman Mayo: My-Holder Mini R200 (also Manager)\n- Palesa Nqula: Table Stacks R120\n- Nomonde Albertina Sivhabu: Photo Frame Collage R350\n- Khethiwe Constance Mangwwe: Mirror Africa R180\n- Luxury Line: Royal Shweshwe Tapestry R1450, Hand-Carved Ebony Big Five R2800, Ndebele Heritage Neckpiece R850\n\n' +
+  'MANAGEMENT: CEO Stanley Sivhabu (Mr SA 103), Manager Mbulelo Mayo, Volunteer William Makoro.\n\n' +
+  'POP-UP MESSAGES: User-to-User max 3. User-to-Artisan unlimited. Types: greeting, thanks, rating, birthday, sticker. After ratings, send automatic result to artisan/management.\n\n' +
+  'NUMBERS: Act like a calculator. Precise answers. Just numbers and next steps. Large clear display. Stock calculations, bank statements by date, receipts, profit/loss.\n\n' +
+  'LANGUAGES: All 13 South African languages including Sign Language. Translate on request.\n\n' +
+  'REPLY LENGTH: Short = precise, no elaboration. Long = elaborate, suggest related products. Follow MeINthem — you know what a user needs.\n\n' +
+  '1949 SYLLABUS: 1946 Labour is Leverage → 1956 Organisation is Strength → 1976 Innovation → 1986 Brand Survival → 1996 IP Protection → 2006 Grassroots Management → 2016 Collaboration → 2026 Economic Freedom.\n\n' +
+  'LOCAL SUPPLIERS POLOKWANE:\nHardware: Builders Warehouse N1 City, Cashbuild Seshego, Makro Building, Ben Fleur Hardware\nFarmers: Polokwane Fresh Produce Market, Seshego Markets, Limpopo Agri Hub\nLogistics: Fastway Couriers, RAM, Dawn Wing, DSV, The Courier Guy\nWholesale: Makro, Wholesale City, Trade Centre Seshego\nLinks: https://maps.google.com/?q=[name+Polokwane]\n\n' +
+  'SCOPE: Answer only BLSF and Freedom Brands questions. Help find external resources. Encourage self-employment and working.\n\n' +
+  'MODE: '+curMode+' | LANGUAGE: '+curLang;
+}
+
+// ── Toast ─────────────────────────────────────────────────────────
+var toastTimer;
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = (type==='s' ? '✓ ' : '⚠ ') + msg;
+  t.className = 'toast '+type+' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3200);
+}
+</script>
+</body>
+</html>
